@@ -1,8 +1,8 @@
 {
-    "name": "xyz",
+    "name": "kind",
     "version": "0.0.1",
     "resources": {
-        "xyz:index:Random": {
+        "kind:index:Cluster": {
             "properties": {
                 "length": {
                     "type": "integer"

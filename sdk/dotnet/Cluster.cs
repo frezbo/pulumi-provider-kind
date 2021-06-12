@@ -7,10 +7,10 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Pulumi.Serialization;
 
-namespace Pulumi.Xyz
+namespace Pulumi.Kind
 {
-    [XyzResourceType("xyz:index:Random")]
-    public partial class Random : Pulumi.CustomResource
+    [KindResourceType("kind:index:Cluster")]
+    public partial class Cluster : Pulumi.CustomResource
     {
         [Output("length")]
         public Output<int> Length { get; private set; } = null!;
@@ -20,19 +20,19 @@ namespace Pulumi.Xyz
 
 
         /// <summary>
-        /// Create a Random resource with the given unique name, arguments, and options.
+        /// Create a Cluster resource with the given unique name, arguments, and options.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resource</param>
         /// <param name="args">The arguments used to populate this resource's properties</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public Random(string name, RandomArgs args, CustomResourceOptions? options = null)
-            : base("xyz:index:Random", name, args ?? new RandomArgs(), MakeResourceOptions(options, ""))
+        public Cluster(string name, ClusterArgs args, CustomResourceOptions? options = null)
+            : base("kind:index:Cluster", name, args ?? new ClusterArgs(), MakeResourceOptions(options, ""))
         {
         }
 
-        private Random(string name, Input<string> id, CustomResourceOptions? options = null)
-            : base("xyz:index:Random", name, null, MakeResourceOptions(options, id))
+        private Cluster(string name, Input<string> id, CustomResourceOptions? options = null)
+            : base("kind:index:Cluster", name, null, MakeResourceOptions(options, id))
         {
         }
 
@@ -48,25 +48,25 @@ namespace Pulumi.Xyz
             return merged;
         }
         /// <summary>
-        /// Get an existing Random resource's state with the given name, ID, and optional extra
+        /// Get an existing Cluster resource's state with the given name, ID, and optional extra
         /// properties used to qualify the lookup.
         /// </summary>
         ///
         /// <param name="name">The unique name of the resulting resource.</param>
         /// <param name="id">The unique provider ID of the resource to lookup.</param>
         /// <param name="options">A bag of options that control this resource's behavior</param>
-        public static Random Get(string name, Input<string> id, CustomResourceOptions? options = null)
+        public static Cluster Get(string name, Input<string> id, CustomResourceOptions? options = null)
         {
-            return new Random(name, id, options);
+            return new Cluster(name, id, options);
         }
     }
 
-    public sealed class RandomArgs : Pulumi.ResourceArgs
+    public sealed class ClusterArgs : Pulumi.ResourceArgs
     {
         [Input("length", required: true)]
         public Input<int> Length { get; set; } = null!;
 
-        public RandomArgs()
+        public ClusterArgs()
         {
         }
     }

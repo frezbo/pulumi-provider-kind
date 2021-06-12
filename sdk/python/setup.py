@@ -12,26 +12,29 @@ class InstallPluginCommand(install):
     def run(self):
         install.run(self)
         try:
-            check_call(['pulumi', 'plugin', 'install', 'resource', 'xyz', '${PLUGIN_VERSION}'])
+            check_call(['pulumi', 'plugin', 'install', 'resource', 'kind', '${PLUGIN_VERSION}'])
         except OSError as error:
             if error.errno == errno.ENOENT:
                 print("""
-                There was an error installing the xyz resource provider plugin.
+                There was an error installing the kind resource provider plugin.
                 It looks like `pulumi` is not installed on your system.
                 Please visit https://pulumi.com/ to install the Pulumi CLI.
                 You may try manually installing the plugin by running
-                `pulumi plugin install resource xyz ${PLUGIN_VERSION}`
+                `pulumi plugin install resource kind ${PLUGIN_VERSION}`
                 """)
             else:
                 raise
 
 
 def readme():
-    with open('README.md', encoding='utf-8') as f:
-        return f.read()
+    try:
+        with open('README.md', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+            return "kind Pulumi Package - Development Version"
 
 
-setup(name='pulumi_xyz',
+setup(name='pulumi_kind',
       version='${VERSION}',
       long_description=readme(),
       long_description_content_type='text/markdown',
@@ -40,8 +43,8 @@ setup(name='pulumi_xyz',
       },
       packages=find_packages(),
       package_data={
-          'pulumi_xyz': [
-              'py.typed'
+          'pulumi_kind': [
+              'py.typed',
           ]
       },
       install_requires=[

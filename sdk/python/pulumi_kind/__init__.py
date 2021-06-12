@@ -5,17 +5,17 @@
 from . import _utilities
 import typing
 # Export this package's modules as members:
+from .cluster import *
 from .provider import *
-from .random import *
 _utilities.register(
     resource_modules="""
 [
  {
-  "pkg": "xyz",
+  "pkg": "kind",
   "mod": "index",
-  "fqn": "pulumi_xyz",
+  "fqn": "pulumi_kind",
   "classes": {
-   "xyz:index:Random": "Random"
+   "kind:index:Cluster": "Cluster"
   }
  }
 ]
@@ -23,9 +23,9 @@ _utilities.register(
     resource_packages="""
 [
  {
-  "pkg": "xyz",
-  "token": "pulumi:providers:xyz",
-  "fqn": "pulumi_xyz",
+  "pkg": "kind",
+  "token": "pulumi:providers:kind",
+  "fqn": "pulumi_kind",
   "class": "Provider"
  }
 ]
