@@ -1,5 +1,6 @@
 {
     "name": "kind",
+    "version": "0.0.1",
     "description": "A Pulumi package for creating and managing KIND clusters,",
     "keywords": [
         "pulumi",

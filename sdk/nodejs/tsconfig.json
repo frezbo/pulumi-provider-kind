@@ -13,9 +13,25 @@
         "strict": true
     },
     "files": [
-        "cluster.ts",
+        "cluster/cluster.ts",
+        "cluster/index.ts",
+        "config/index.ts",
+        "config/vars.ts",
         "index.ts",
+        "mount/index.ts",
+        "mount/mount.ts",
+        "networking/index.ts",
+        "networking/networking.ts",
+        "node/index.ts",
+        "node/node.ts",
+        "patchjson6902/index.ts",
+        "patchjson6902/patchJSON6902.ts",
+        "portmapping/index.ts",
+        "portmapping/portMapping.ts",
         "provider.ts",
+        "types/index.ts",
+        "types/input.ts",
+        "types/output.ts",
         "utilities.ts"
     ]
 }

@@ -1,3 +1,3 @@
-// Package kind exports types, functions, subpackages for provisioning kind resources.
+// A Pulumi package for creating and managing KIND clusters,
 //
 package kind

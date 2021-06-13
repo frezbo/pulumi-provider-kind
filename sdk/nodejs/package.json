@@ -1,11 +1,22 @@
 {
     "name": "@pulumi/kind",
     "version": "${VERSION}",
+    "keywords": [
+        "pulumi",
+        "kind"
+    ],
+    "homepage": "https://github.com/frezbo/pulumi-provider-kind",
+    "repository": "https://github.com/frezbo/pulumi-provider-kind",
+    "license": "Apache-2.0",
     "scripts": {
         "build": "tsc"
     },
-    "peerDependencies": {
-        "@pulumi/pulumi": "latest"
+    "dependencies": {
+        "@pulumi/pulumi": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^15.12.0",
+        "typescript": "^3.7.0"
     },
     "pulumi": {
         "resource": true

@@ -16,101 +16,210 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 
-	"github.com/pulumi/pulumi/sdk/v3/go/common/tools"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
-
+	"github.com/alecthomas/jsonschema"
+	"github.com/frezbo/pulumi-provider-kind/provider/v3/pkg/gen"
+	providerVersion "github.com/frezbo/pulumi-provider-kind/provider/v3/pkg/version"
 	"github.com/pkg/errors"
 	dotnetgen "github.com/pulumi/pulumi/pkg/v3/codegen/dotnet"
 	gogen "github.com/pulumi/pulumi/pkg/v3/codegen/go"
 	nodejsgen "github.com/pulumi/pulumi/pkg/v3/codegen/nodejs"
-	pygen "github.com/pulumi/pulumi/pkg/v3/codegen/python"
-	pschema "github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+	pythongen "github.com/pulumi/pulumi/pkg/v3/codegen/python"
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
+	"sigs.k8s.io/kind/pkg/apis/config/v1alpha4"
 )
 
-// emitPackage emits an entire package pack into the configured output directory with the configured settings.
-func emitPackage(schemaPath, targetSdkFolder string) error {
-	schemaBytes, err := ioutil.ReadFile(schemaPath)
-	if err != nil {
-		return errors.Wrap(err, "reading schema")
-	}
+// TemplateDir is the path to the base directory for code generator templates.
+var TemplateDir string
 
-	var spec pschema.PackageSpec
-	err = json.Unmarshal(schemaBytes, &spec)
-	if err != nil {
-		return errors.Wrap(err, "reading schema")
-	}
+// BaseDir is the path to the base pulumi-kind directory.
+var BaseDir string
 
-	ppkg, err := pschema.ImportSpec(spec, nil)
-	if err != nil {
-		return errors.Wrap(err, "reading schema")
-	}
+// Language is the SDK language.
+type Language string
 
-	toolDescription := "the Pulumi SDK Generator"
-	extraFiles := map[string][]byte{}
-
-	sdkGenerators := map[string]func() (map[string][]byte, error){
-		"python": func() (map[string][]byte, error) {
-			return pygen.GeneratePackage(toolDescription, ppkg, extraFiles)
-		},
-		"nodejs": func() (map[string][]byte, error) {
-			return nodejsgen.GeneratePackage(toolDescription, ppkg, extraFiles)
-		},
-		"go": func() (map[string][]byte, error) {
-			return gogen.GeneratePackage(toolDescription, ppkg)
-		},
-		"dotnet": func() (map[string][]byte, error) {
-			return dotnetgen.GeneratePackage(toolDescription, ppkg, extraFiles)
-		},
-	}
-
-	for sdkName, generator := range sdkGenerators {
-		files, err := generator()
-		if err != nil {
-			return errors.Wrapf(err, "generating %s package", sdkName)
-		}
-
-		for f, contents := range files {
-			if err := emitFile(path.Join(targetSdkFolder, sdkName), f, contents); err != nil {
-				return errors.Wrapf(err, "emitting file %v", f)
-			}
-		}
-	}
-
-	return nil
-}
-
-func emitFile(outDir, relPath string, contents []byte) error {
-	p := path.Join(outDir, relPath)
-	if err := tools.EnsureDir(path.Dir(p)); err != nil {
-		return errors.Wrap(err, "creating directory")
-	}
-
-	f, err := os.Create(p)
-	if err != nil {
-		return errors.Wrap(err, "creating file")
-	}
-	defer contract.IgnoreClose(f)
-
-	_, err = f.Write(contents)
-	return err
-}
+const (
+	DotNet Language = "dotnet"
+	Go     Language = "go"
+	NodeJS Language = "nodejs"
+	Kinds  Language = "kinds"
+	Python Language = "python"
+	Schema Language = "schema"
+)
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Printf("Usage: pulumi-sdkgen-kind <schema-file> <target-sdk-folder>\n")
+	flag.Usage = func() {
+		const usageFormat = "Usage: %s <language> <swagger-or-schema-file> <root-pulumi-kind-dir>"
+		_, err := fmt.Fprintf(flag.CommandLine.Output(), usageFormat, os.Args[0])
+		contract.IgnoreError(err)
+		flag.PrintDefaults()
+	}
+
+	var version string
+	flag.StringVar(&version, "version", providerVersion.Version, "the provider version to record in the generated code")
+
+	flag.Parse()
+	args := flag.Args()
+	if len(args) < 3 {
+		flag.Usage()
 		return
 	}
 
-	schemaPath := os.Args[1]
-	targetSdkFolder := os.Args[2]
+	language, inputFile := Language(args[0]), args[1]
 
-	err := emitPackage(schemaPath, targetSdkFolder)
-	if err != nil {
-		fmt.Printf("Failed: %s", err.Error())
+	BaseDir = args[2]
+	TemplateDir = filepath.Join(BaseDir, "provider", "pkg", "gen")
+	outdir := filepath.Join(BaseDir, "sdk", string(language))
+
+	switch language {
+	case NodeJS:
+		templateDir := filepath.Join(TemplateDir, "nodejs-templates")
+		writeNodeJSClient(readSchema(inputFile, version), outdir, templateDir)
+	case Python:
+		templateDir := filepath.Join(TemplateDir, "python-templates")
+		writePythonClient(readSchema(inputFile, version), outdir, templateDir)
+	case DotNet:
+		templateDir := filepath.Join(TemplateDir, "dotnet-templates")
+		writeDotnetClient(readSchema(inputFile, version), outdir, templateDir)
+	case Go:
+		templateDir := filepath.Join(TemplateDir, "_go-templates")
+		writeGoClient(readSchema(inputFile, version), outdir, templateDir)
+	case Schema:
+		pkgSpec := generateSchema()
+		mustWritePulumiSchema(pkgSpec, version)
+	default:
+		panic(fmt.Sprintf("Unrecognized language '%s'", language))
 	}
+}
+
+func readSchema(schemaPath string, version string) *schema.Package {
+	// Read in, decode, and import the schema.
+	schemaBytes, err := ioutil.ReadFile(schemaPath)
+	if err != nil {
+		panic(err)
+	}
+
+	var pkgSpec schema.PackageSpec
+	if err = json.Unmarshal(schemaBytes, &pkgSpec); err != nil {
+		panic(err)
+	}
+	pkgSpec.Version = version
+
+	pkg, err := schema.ImportSpec(pkgSpec, nil)
+	if err != nil {
+		panic(err)
+	}
+	return pkg
+}
+
+func generateSchema() schema.PackageSpec {
+	schema := jsonschema.Reflect(&v1alpha4.Cluster{})
+	return gen.PulumiSchema(schema)
+}
+
+func writeNodeJSClient(pkg *schema.Package, outdir, templateDir string) {
+	_, err := nodejsgen.LanguageResources(pkg)
+	if err != nil {
+		panic(err)
+	}
+
+	overlays := map[string][]byte{}
+	files, err := nodejsgen.GeneratePackage("pulumigen", pkg, overlays)
+	if err != nil {
+		panic(err)
+	}
+
+	mustWriteFiles(outdir, files)
+}
+
+func writePythonClient(pkg *schema.Package, outdir string, templateDir string) {
+	_, err := pythongen.LanguageResources("pulumigen", pkg)
+	if err != nil {
+		panic(err)
+	}
+
+	overlays := map[string][]byte{}
+
+	files, err := pythongen.GeneratePackage("pulumigen", pkg, overlays)
+	if err != nil {
+		panic(err)
+	}
+
+	mustWriteFiles(outdir, files)
+}
+
+func writeDotnetClient(pkg *schema.Package, outdir, templateDir string) {
+	_, err := dotnetgen.LanguageResources("pulumigen", pkg)
+	if err != nil {
+		panic(err)
+	}
+
+	overlays := map[string][]byte{}
+
+	files, err := dotnetgen.GeneratePackage("pulumigen", pkg, overlays)
+	if err != nil {
+		panic(err)
+	}
+
+	for filename, contents := range files {
+		path := filepath.Join(outdir, filename)
+
+		if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			panic(err)
+		}
+		err := ioutil.WriteFile(path, contents, 0644)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func writeGoClient(pkg *schema.Package, outdir string, templateDir string) {
+	files, err := gogen.GeneratePackage("pulumigen", pkg)
+	if err != nil {
+		panic(err)
+	}
+
+	mustWriteFiles(outdir, files)
+}
+
+func mustWriteFiles(rootDir string, files map[string][]byte) {
+	for filename, contents := range files {
+		mustWriteFile(rootDir, filename, contents)
+	}
+}
+
+func mustWriteFile(rootDir, filename string, contents []byte) {
+	outPath := filepath.Join(rootDir, filename)
+
+	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
+		panic(err)
+	}
+	err := ioutil.WriteFile(outPath, contents, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func mustWritePulumiSchema(pkgSpec schema.PackageSpec, version string) {
+	schemaJSON, err := json.MarshalIndent(pkgSpec, "", "    ")
+	if err != nil {
+		panic(errors.Wrap(err, "marshaling Pulumi schema"))
+	}
+
+	mustWriteFile(BaseDir, filepath.Join("provider", "cmd", "pulumi-resource-kind", "schema.json"), schemaJSON)
+
+	versionedPkgSpec := pkgSpec
+	versionedPkgSpec.Version = version
+	versionedSchemaJSON, err := json.MarshalIndent(versionedPkgSpec, "", "    ")
+	if err != nil {
+		panic(errors.Wrap(err, "marshaling Pulumi schema"))
+	}
+	mustWriteFile(BaseDir, filepath.Join("sdk", "schema", "schema.json"), versionedSchemaJSON)
 }
