@@ -548,21 +548,13 @@
         "go": {
             "generateResourceContainerTypes": true,
             "importBasePath": "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind",
-            "moduleToPackage": {
-                "Cluster": "Cluster",
-                "Mount": "Mount",
-                "Networking": "Networking",
-                "Node": "Node",
-                "PatchJSON6902": "PatchJSON6902",
-                "PortMapping": "PortMapping"
-            },
             "packageImportAliases": {
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Cluster": "Cluster",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Mount": "Mount",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Networking": "Networking",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Node": "Node",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/PatchJSON6902": "PatchJSON6902",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/PortMapping": "PortMapping"
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/cluster": "cluster",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/mount": "mount",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/networking": "networking",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/node": "node",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/patchjson6902": "patchjson6902",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/portmapping": "portmapping"
             }
         },
         "nodejs": {
@@ -572,14 +564,6 @@
             "devDependencies": {
                 "@types/node": "^15.12.0",
                 "typescript": "^3.7.0"
-            },
-            "moduleToPackage": {
-                "Cluster": "Cluster",
-                "Mount": "Mount",
-                "Networking": "Networking",
-                "Node": "Node",
-                "PatchJSON6902": "PatchJSON6902",
-                "PortMapping": "PortMapping"
             }
         }
     }

@@ -7,9 +7,9 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/mount"
-	"github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/patchjson6902"
-	"github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/portmapping"
+	mount "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/mount"
+	patchjson6902 "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/patchjson6902"
+	portmapping "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/portmapping"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
