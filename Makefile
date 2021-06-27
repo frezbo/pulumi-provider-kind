@@ -43,10 +43,11 @@ test_provider::
 	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
 
 go_sdk::
+	rm -rf sdk/go
 	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} go $(SCHEMA_FILE) $(CURDIR)
 
-nodejs_sdk:: VERSION := $(shell pulumictl get version --language javascript)
 nodejs_sdk::
+	rm -rf sdk/nodejs
 	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \

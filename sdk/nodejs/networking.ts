@@ -2,7 +2,7 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as utilities from "../utilities";
+import * as utilities from "./utilities";
 
 /**
  * KIND Networking
@@ -21,7 +21,7 @@ export class Networking extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:Networking:Networking';
+    public static readonly __pulumiType = 'kind:index:Networking';
 
     /**
      * Returns true if the given object is an instance of Networking.  This is designed to work even
@@ -34,13 +34,6 @@ export class Networking extends pulumi.CustomResource {
         return obj['__pulumiType'] === Networking.__pulumiType;
     }
 
-    public readonly apiServerAddress!: pulumi.Output<string | undefined>;
-    public readonly apiServerPort!: pulumi.Output<number | undefined>;
-    public readonly disableDefaultCNI!: pulumi.Output<boolean | undefined>;
-    public readonly ipFamily!: pulumi.Output<string | undefined>;
-    public readonly kubeProxyMode!: pulumi.Output<string | undefined>;
-    public readonly podSubnet!: pulumi.Output<string | undefined>;
-    public readonly serviceSubnet!: pulumi.Output<string | undefined>;
 
     /**
      * Create a Networking resource with the given unique name, arguments, and options.
@@ -61,13 +54,6 @@ export class Networking extends pulumi.CustomResource {
             inputs["podSubnet"] = args ? args.podSubnet : undefined;
             inputs["serviceSubnet"] = args ? args.serviceSubnet : undefined;
         } else {
-            inputs["apiServerAddress"] = undefined /*out*/;
-            inputs["apiServerPort"] = undefined /*out*/;
-            inputs["disableDefaultCNI"] = undefined /*out*/;
-            inputs["ipFamily"] = undefined /*out*/;
-            inputs["kubeProxyMode"] = undefined /*out*/;
-            inputs["podSubnet"] = undefined /*out*/;
-            inputs["serviceSubnet"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});

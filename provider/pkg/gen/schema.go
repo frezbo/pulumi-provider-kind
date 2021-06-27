@@ -10,6 +10,10 @@ import (
 	"github.com/pulumi/pulumi/sdk/go/common/util/contract"
 )
 
+const (
+	kindClusterDefinition = "Cluster"
+)
+
 func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 	pkg := schema.PackageSpec{
 		Name:        "kind",
@@ -49,11 +53,9 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 
 	pkgImportAliases := map[string]string{}
 
-	for defintion, props := range swagger.Definitions {
+	for defintion, definitionProperties := range swagger.Definitions {
 
-		defintionLowerCase := strings.ToLower(defintion)
-		tok := fmt.Sprintf("kind:%s:%s", defintion, defintion)
-		pkgImportAliases[fmt.Sprintf("%s/%s", goImportPath, defintionLowerCase)] = defintionLowerCase
+		tok := fmt.Sprintf("kind:index:%s", defintion)
 
 		objectSpec := schema.ObjectTypeSpec{
 			Description: fmt.Sprintf("KIND %s", defintion),
@@ -61,50 +63,54 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 			Properties:  map[string]schema.PropertySpec{},
 			Language:    map[string]json.RawMessage{},
 		}
-		pkg.Types[tok] = schema.ComplexTypeSpec{
-			ObjectTypeSpec: objectSpec,
-		}
 
 		resourceSpec := schema.ResourceSpec{
 			ObjectTypeSpec:  objectSpec,
 			InputProperties: map[string]schema.PropertySpec{},
-			RequiredInputs:  props.Required,
+			RequiredInputs:  definitionProperties.Required,
 		}
 
-		for _, key := range props.Properties.Keys() {
-			if key == "PatchJSON6902" {
-				continue
-			}
-			val, _ := props.Properties.Get(key)
-			castedVal := val.(*jsonschema.Type)
-			ref := castedVal.Ref
-			if ref != "" {
-				ref = strings.ReplaceAll(ref, "#/definitions/", "")
-				ref = fmt.Sprintf("%s/kind:%s:%s", "#/types", ref, ref)
-			}
-			inputProps := schema.PropertySpec{
-				TypeSpec: schema.TypeSpec{
-					Type: castedVal.Type,
-					Ref:  ref,
-				},
-			}
-			if castedVal.Items != nil {
-				ref := castedVal.Items.Ref
-				if ref != "" {
-					ref = strings.ReplaceAll(ref, "#/definitions/", "")
-					ref = fmt.Sprintf("%s/kind:%s:%s", "#/types", ref, ref)
-				}
-				inputProps.TypeSpec.Items = &schema.TypeSpec{
-					Type: castedVal.Items.Type,
-					Ref:  ref,
-				}
-			}
-			resourceSpec.InputProperties[key] = inputProps
-			resourceSpec.Properties[key] = inputProps
-			pkg.Types[tok].ObjectTypeSpec.Properties[key] = inputProps
-		}
+		pkgImportAliases[fmt.Sprintf("%s/%s", goImportPath, defintion)] = defintion
 
-		pkg.Resources[tok] = resourceSpec
+		for _, definitionPropertyKey := range definitionProperties.Properties.Keys() {
+			if val, ok := definitionProperties.Properties.Get(definitionPropertyKey); ok {
+				// the returned value is an interface
+				// we need to cast it to jsonSchema.Type to access the fields
+				definitionPropertyValue := val.(*jsonschema.Type)
+				resourceInputProperty := schema.PropertySpec{
+					TypeSpec: schema.TypeSpec{
+						Type: definitionPropertyValue.Type,
+						Ref:  openAPISpecRefToPulumiRef(definitionPropertyValue.Ref),
+					},
+				}
+				if definitionPropertyValue.Items != nil {
+					resourceInputProperty.TypeSpec.Items = &schema.TypeSpec{
+						Type: definitionPropertyValue.Items.Type,
+						Ref:  openAPISpecRefToPulumiRef(definitionPropertyValue.Items.Ref),
+					}
+				}
+
+				resourceSpec.InputProperties[definitionPropertyKey] = resourceInputProperty
+				if defintion == kindClusterDefinition {
+					resourceSpec.Properties["kubeconfig"] = schema.PropertySpec{
+						Description: "KubeConfig",
+						TypeSpec: schema.TypeSpec{
+							Type: "string",
+						},
+					}
+					resourceSpec.Required = []string{"kubeconfig"}
+				}
+				pkg.Resources[tok] = resourceSpec
+				pkg.Types[tok] = schema.ComplexTypeSpec{
+					ObjectTypeSpec: schema.ObjectTypeSpec{
+						Description: fmt.Sprintf("KIND %s type", definitionPropertyKey),
+						Type:        "object",
+						Properties:  resourceSpec.InputProperties,
+						Language:    map[string]json.RawMessage{},
+					},
+				}
+			}
+		}
 
 	}
 
@@ -131,4 +137,16 @@ func rawMessage(v interface{}) json.RawMessage {
 	bytes, err := json.Marshal(v)
 	contract.Assert(err == nil)
 	return bytes
+}
+
+func openAPISpecRefToPulumiRef(ref string) string {
+	if ref != "" {
+		// convert openAPI schema references to Pulumi schema reference
+		// remove `definitions` and replace by `types`
+		// ref: https://www.pulumi.com/docs/guides/pulumi-packages/schema/#
+		ref = strings.ReplaceAll(ref, "#/definitions/", "")
+		ref = fmt.Sprintf("%s/kind:index:%s", "#/types", ref)
+		return ref
+	}
+	return ref
 }

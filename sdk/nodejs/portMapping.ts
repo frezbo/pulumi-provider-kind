@@ -2,7 +2,7 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as utilities from "../utilities";
+import * as utilities from "./utilities";
 
 /**
  * KIND PortMapping
@@ -21,7 +21,7 @@ export class PortMapping extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:PortMapping:PortMapping';
+    public static readonly __pulumiType = 'kind:index:PortMapping';
 
     /**
      * Returns true if the given object is an instance of PortMapping.  This is designed to work even
@@ -34,10 +34,6 @@ export class PortMapping extends pulumi.CustomResource {
         return obj['__pulumiType'] === PortMapping.__pulumiType;
     }
 
-    public readonly containerPort!: pulumi.Output<number | undefined>;
-    public readonly hostPort!: pulumi.Output<number | undefined>;
-    public readonly listenAddress!: pulumi.Output<string | undefined>;
-    public readonly protocol!: pulumi.Output<string | undefined>;
 
     /**
      * Create a PortMapping resource with the given unique name, arguments, and options.
@@ -55,10 +51,6 @@ export class PortMapping extends pulumi.CustomResource {
             inputs["listenAddress"] = args ? args.listenAddress : undefined;
             inputs["protocol"] = args ? args.protocol : undefined;
         } else {
-            inputs["containerPort"] = undefined /*out*/;
-            inputs["hostPort"] = undefined /*out*/;
-            inputs["listenAddress"] = undefined /*out*/;
-            inputs["protocol"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});

@@ -2,8 +2,8 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import { input as inputs, output as outputs } from "../types";
-import * as utilities from "../utilities";
+import { input as inputs, output as outputs } from "./types";
+import * as utilities from "./utilities";
 
 /**
  * KIND Node
@@ -22,7 +22,7 @@ export class Node extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:Node:Node';
+    public static readonly __pulumiType = 'kind:index:Node';
 
     /**
      * Returns true if the given object is an instance of Node.  This is designed to work even
@@ -35,13 +35,6 @@ export class Node extends pulumi.CustomResource {
         return obj['__pulumiType'] === Node.__pulumiType;
     }
 
-    public readonly extraMounts!: pulumi.Output<outputs.Mount.Mount[] | undefined>;
-    public readonly extraPortMappings!: pulumi.Output<outputs.PortMapping.PortMapping[] | undefined>;
-    public readonly image!: pulumi.Output<string | undefined>;
-    public readonly kubeadmConfigPatches!: pulumi.Output<string[] | undefined>;
-    public readonly kubeadmConfigPatchesJSON6902!: pulumi.Output<outputs.PatchJSON6902.PatchJSON6902[] | undefined>;
-    public readonly labels!: pulumi.Output<{[key: string]: string} | undefined>;
-    public readonly role!: pulumi.Output<string | undefined>;
 
     /**
      * Create a Node resource with the given unique name, arguments, and options.
@@ -62,13 +55,6 @@ export class Node extends pulumi.CustomResource {
             inputs["labels"] = args ? args.labels : undefined;
             inputs["role"] = args ? args.role : undefined;
         } else {
-            inputs["extraMounts"] = undefined /*out*/;
-            inputs["extraPortMappings"] = undefined /*out*/;
-            inputs["image"] = undefined /*out*/;
-            inputs["kubeadmConfigPatches"] = undefined /*out*/;
-            inputs["kubeadmConfigPatchesJSON6902"] = undefined /*out*/;
-            inputs["labels"] = undefined /*out*/;
-            inputs["role"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});
@@ -81,11 +67,11 @@ export class Node extends pulumi.CustomResource {
  * The set of arguments for constructing a Node resource.
  */
 export interface NodeArgs {
-    extraMounts?: pulumi.Input<pulumi.Input<inputs.Mount.MountArgs>[]>;
-    extraPortMappings?: pulumi.Input<pulumi.Input<inputs.PortMapping.PortMappingArgs>[]>;
+    extraMounts?: pulumi.Input<pulumi.Input<inputs.MountArgs>[]>;
+    extraPortMappings?: pulumi.Input<pulumi.Input<inputs.PortMappingArgs>[]>;
     image?: pulumi.Input<string>;
     kubeadmConfigPatches?: pulumi.Input<pulumi.Input<string>[]>;
-    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902.PatchJSON6902Args>[]>;
+    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902Args>[]>;
     labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     role?: pulumi.Input<string>;
 }

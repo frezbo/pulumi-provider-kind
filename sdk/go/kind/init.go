@@ -10,6 +10,36 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+type module struct {
+	version semver.Version
+}
+
+func (m *module) Version() semver.Version {
+	return m.version
+}
+
+func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
+	switch typ {
+	case "kind:index:Cluster":
+		r = &Cluster{}
+	case "kind:index:Mount":
+		r = &Mount{}
+	case "kind:index:Networking":
+		r = &Networking{}
+	case "kind:index:Node":
+		r = &Node{}
+	case "kind:index:PatchJSON6902":
+		r = &PatchJSON6902{}
+	case "kind:index:PortMapping":
+		r = &PortMapping{}
+	default:
+		return nil, fmt.Errorf("unknown resource type: %s", typ)
+	}
+
+	err = ctx.RegisterResource(typ, name, nil, r, pulumi.URN_(urn))
+	return
+}
+
 type pkg struct {
 	version semver.Version
 }
@@ -33,6 +63,11 @@ func init() {
 	if err != nil {
 		fmt.Printf("failed to determine package version. defaulting to v1: %v\n", err)
 	}
+	pulumi.RegisterResourceModule(
+		"kind",
+		"index",
+		&module{version},
+	)
 	pulumi.RegisterResourcePackage(
 		"kind",
 		&pkg{version},

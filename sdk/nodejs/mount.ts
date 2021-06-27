@@ -2,7 +2,7 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as utilities from "../utilities";
+import * as utilities from "./utilities";
 
 /**
  * KIND Mount
@@ -21,7 +21,7 @@ export class Mount extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:Mount:Mount';
+    public static readonly __pulumiType = 'kind:index:Mount';
 
     /**
      * Returns true if the given object is an instance of Mount.  This is designed to work even
@@ -34,11 +34,6 @@ export class Mount extends pulumi.CustomResource {
         return obj['__pulumiType'] === Mount.__pulumiType;
     }
 
-    public readonly containerPath!: pulumi.Output<string | undefined>;
-    public readonly hostPath!: pulumi.Output<string | undefined>;
-    public readonly propagation!: pulumi.Output<string | undefined>;
-    public readonly readOnly!: pulumi.Output<boolean | undefined>;
-    public readonly selinuxRelabel!: pulumi.Output<boolean | undefined>;
 
     /**
      * Create a Mount resource with the given unique name, arguments, and options.
@@ -57,11 +52,6 @@ export class Mount extends pulumi.CustomResource {
             inputs["readOnly"] = args ? args.readOnly : undefined;
             inputs["selinuxRelabel"] = args ? args.selinuxRelabel : undefined;
         } else {
-            inputs["containerPath"] = undefined /*out*/;
-            inputs["hostPath"] = undefined /*out*/;
-            inputs["propagation"] = undefined /*out*/;
-            inputs["readOnly"] = undefined /*out*/;
-            inputs["selinuxRelabel"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});

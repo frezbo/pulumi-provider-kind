@@ -74,6 +74,7 @@ func main() {
 	language, inputFile := Language(args[0]), args[1]
 
 	BaseDir = args[2]
+	fmt.Println(BaseDir)
 	TemplateDir = filepath.Join(BaseDir, "provider", "pkg", "gen")
 	outdir := filepath.Join(BaseDir, "sdk", string(language))
 

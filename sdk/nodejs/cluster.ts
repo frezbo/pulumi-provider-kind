@@ -2,8 +2,8 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import { input as inputs, output as outputs } from "../types";
-import * as utilities from "../utilities";
+import { input as inputs, output as outputs } from "./types";
+import * as utilities from "./utilities";
 
 /**
  * KIND Cluster
@@ -22,7 +22,7 @@ export class Cluster extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:Cluster:Cluster';
+    public static readonly __pulumiType = 'kind:index:Cluster';
 
     /**
      * Returns true if the given object is an instance of Cluster.  This is designed to work even
@@ -35,17 +35,10 @@ export class Cluster extends pulumi.CustomResource {
         return obj['__pulumiType'] === Cluster.__pulumiType;
     }
 
-    public readonly apiVersion!: pulumi.Output<string | undefined>;
-    public readonly containerdConfigPatches!: pulumi.Output<string[] | undefined>;
-    public readonly containerdConfigPatchesJSON6902!: pulumi.Output<string[] | undefined>;
-    public readonly featureGates!: pulumi.Output<{[key: string]: string} | undefined>;
-    public readonly kind!: pulumi.Output<string | undefined>;
-    public readonly kubeadmConfigPatches!: pulumi.Output<string[] | undefined>;
-    public readonly kubeadmConfigPatchesJSON6902!: pulumi.Output<outputs.PatchJSON6902.PatchJSON6902[] | undefined>;
-    public readonly name!: pulumi.Output<string | undefined>;
-    public readonly networking!: pulumi.Output<outputs.Networking.Networking | undefined>;
-    public readonly nodes!: pulumi.Output<outputs.Node.Node[] | undefined>;
-    public readonly runtimeConfig!: pulumi.Output<{[key: string]: string} | undefined>;
+    /**
+     * KubeConfig
+     */
+    public /*out*/ readonly kubeconfig!: pulumi.Output<string>;
 
     /**
      * Create a Cluster resource with the given unique name, arguments, and options.
@@ -69,18 +62,9 @@ export class Cluster extends pulumi.CustomResource {
             inputs["networking"] = args ? args.networking : undefined;
             inputs["nodes"] = args ? args.nodes : undefined;
             inputs["runtimeConfig"] = args ? args.runtimeConfig : undefined;
+            inputs["kubeconfig"] = undefined /*out*/;
         } else {
-            inputs["apiVersion"] = undefined /*out*/;
-            inputs["containerdConfigPatches"] = undefined /*out*/;
-            inputs["containerdConfigPatchesJSON6902"] = undefined /*out*/;
-            inputs["featureGates"] = undefined /*out*/;
-            inputs["kind"] = undefined /*out*/;
-            inputs["kubeadmConfigPatches"] = undefined /*out*/;
-            inputs["kubeadmConfigPatchesJSON6902"] = undefined /*out*/;
-            inputs["name"] = undefined /*out*/;
-            inputs["networking"] = undefined /*out*/;
-            inputs["nodes"] = undefined /*out*/;
-            inputs["runtimeConfig"] = undefined /*out*/;
+            inputs["kubeconfig"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});
@@ -99,9 +83,9 @@ export interface ClusterArgs {
     featureGates?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     kind?: pulumi.Input<string>;
     kubeadmConfigPatches?: pulumi.Input<pulumi.Input<string>[]>;
-    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902.PatchJSON6902Args>[]>;
+    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902Args>[]>;
     name?: pulumi.Input<string>;
-    networking?: pulumi.Input<inputs.Networking.NetworkingArgs>;
-    nodes?: pulumi.Input<pulumi.Input<inputs.Node.NodeArgs>[]>;
+    networking?: pulumi.Input<inputs.NetworkingArgs>;
+    nodes?: pulumi.Input<pulumi.Input<inputs.NodeArgs>[]>;
     runtimeConfig?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
 }

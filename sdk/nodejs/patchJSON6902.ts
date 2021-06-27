@@ -2,7 +2,7 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import * as utilities from "../utilities";
+import * as utilities from "./utilities";
 
 /**
  * KIND PatchJSON6902
@@ -21,7 +21,7 @@ export class PatchJSON6902 extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:PatchJSON6902:PatchJSON6902';
+    public static readonly __pulumiType = 'kind:index:PatchJSON6902';
 
     /**
      * Returns true if the given object is an instance of PatchJSON6902.  This is designed to work even
@@ -34,10 +34,6 @@ export class PatchJSON6902 extends pulumi.CustomResource {
         return obj['__pulumiType'] === PatchJSON6902.__pulumiType;
     }
 
-    public readonly group!: pulumi.Output<string | undefined>;
-    public readonly kind!: pulumi.Output<string | undefined>;
-    public readonly patch!: pulumi.Output<string | undefined>;
-    public readonly version!: pulumi.Output<string | undefined>;
 
     /**
      * Create a PatchJSON6902 resource with the given unique name, arguments, and options.
@@ -67,10 +63,6 @@ export class PatchJSON6902 extends pulumi.CustomResource {
             inputs["patch"] = args ? args.patch : undefined;
             inputs["version"] = args ? args.version : undefined;
         } else {
-            inputs["group"] = undefined /*out*/;
-            inputs["kind"] = undefined /*out*/;
-            inputs["patch"] = undefined /*out*/;
-            inputs["version"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});
