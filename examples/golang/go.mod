@@ -3,7 +3,7 @@ module kind-go-example
 go 1.16
 
 require (
-	github.com/frezbo/pulumi-provider-kind/sdk/v3 v3.0.0-00010101000000-000000000000
+	github.com/frezbo/pulumi-provider-kind/sdk/v3 v3.0.0-20210613163246-118874c291e9
 	github.com/pulumi/pulumi/sdk/v3 v3.5.1
 )
 

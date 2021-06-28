@@ -17,8 +17,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"math/rand"
-	"time"
 
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
@@ -26,6 +24,7 @@ import (
 	rpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
 	pbempty "github.com/golang/protobuf/ptypes/empty"
+	"sigs.k8s.io/kind/pkg/cluster"
 )
 
 type kindProvider struct {
@@ -124,23 +123,23 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
 	}
 
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	_, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
 	if err != nil {
 		return nil, err
 	}
 
-	if !inputs["length"].IsNumber() {
-		return nil, fmt.Errorf("Expected input property 'length' of type 'number' but got '%s", inputs["length"].TypeString())
+	// name := inputs["name"].StringValue()
+	provider := cluster.NewProvider()
+	if err = provider.Create(k.name); err != nil {
+		return nil, err
 	}
 
-	n := int(inputs["length"].NumberValue())
-
-	// Actually "create" the random number
-	result := makeRandom(n)
-
+	kubeconfig, err := provider.KubeConfig(k.name, false)
+	if err != nil {
+		return nil, err
+	}
 	outputs := map[string]interface{}{
-		"length": n,
-		"result": result,
+		"kubeconfig": kubeconfig,
 	}
 
 	outputProperties, err := plugin.MarshalProperties(
@@ -151,7 +150,7 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 		return nil, err
 	}
 	return &rpc.CreateResponse{
-		Id:         result,
+		Id:         k.name,
 		Properties: outputProperties,
 	}, nil
 }
@@ -188,6 +187,11 @@ func (k *kindProvider) Delete(ctx context.Context, req *rpc.DeleteRequest) (*pbe
 		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
 	}
 
+	provider := cluster.NewProvider()
+	if err := provider.Delete(k.name, ""); err != nil {
+		return &pbempty.Empty{}, err
+	}
+
 	// Note that for our Random resource, we don't have to do anything on Delete.
 	return &pbempty.Empty{}, nil
 }
@@ -217,15 +221,4 @@ func (k *kindProvider) GetSchema(ctx context.Context, req *rpc.GetSchemaRequest)
 func (k *kindProvider) Cancel(context.Context, *pbempty.Empty) (*pbempty.Empty, error) {
 	// TODO
 	return &pbempty.Empty{}, nil
-}
-
-func makeRandom(length int) string {
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
-	charset := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	result := make([]rune, length)
-	for i := range result {
-		result[i] = charset[seededRand.Intn(len(charset))]
-	}
-	return string(result)
 }

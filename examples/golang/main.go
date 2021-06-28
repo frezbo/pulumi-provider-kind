@@ -7,7 +7,7 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		cluster, err := kind.NewCluster(ctx, "kind", &kind.ClusterArgs{})
+		cluster, err := kind.NewCluster(ctx, "kindssss", &kind.ClusterArgs{})
 		if err != nil {
 			return err
 		}
