@@ -36,7 +36,7 @@ export class Cluster extends pulumi.CustomResource {
     }
 
     /**
-     * KubeConfig
+     * kubeconfig content
      */
     public /*out*/ readonly kubeconfig!: pulumi.Output<string>;
 

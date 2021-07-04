@@ -48,7 +48,6 @@ const (
 	DotNet Language = "dotnet"
 	Go     Language = "go"
 	NodeJS Language = "nodejs"
-	Kinds  Language = "kinds"
 	Python Language = "python"
 	Schema Language = "schema"
 )
@@ -74,7 +73,6 @@ func main() {
 	language, inputFile := Language(args[0]), args[1]
 
 	BaseDir = args[2]
-	fmt.Println(BaseDir)
 	TemplateDir = filepath.Join(BaseDir, "provider", "pkg", "gen")
 	outdir := filepath.Join(BaseDir, "sdk", string(language))
 
@@ -174,7 +172,7 @@ func writeDotnetClient(pkg *schema.Package, outdir, templateDir string) {
 		if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 			panic(err)
 		}
-		err := ioutil.WriteFile(path, contents, 0644)
+		err := ioutil.WriteFile(path, contents, 0600)
 		if err != nil {
 			panic(err)
 		}
@@ -202,7 +200,7 @@ func mustWriteFile(rootDir, filename string, contents []byte) {
 	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
 		panic(err)
 	}
-	err := ioutil.WriteFile(outPath, contents, 0644)
+	err := ioutil.WriteFile(outPath, contents, 0600)
 	if err != nil {
 		panic(err)
 	}

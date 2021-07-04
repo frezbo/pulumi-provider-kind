@@ -34,7 +34,14 @@ export class Provider extends pulumi.ProviderResource {
         let inputs: pulumi.Inputs = {};
         opts = opts || {};
         {
+            inputs["configFile"] = args ? args.configFile : undefined;
+            inputs["kubeconfigFile"] = args ? args.kubeconfigFile : undefined;
+            inputs["nodeImage"] = args ? args.nodeImage : undefined;
             inputs["provider"] = args ? args.provider : undefined;
+            inputs["retainNodesOnFailure"] = pulumi.output(args ? args.retainNodesOnFailure : undefined).apply(JSON.stringify);
+            inputs["stopBeforeSettingK8s"] = pulumi.output(args ? args.stopBeforeSettingK8s : undefined).apply(JSON.stringify);
+            inputs["usev1Alpha"] = pulumi.output(args ? args.usev1Alpha : undefined).apply(JSON.stringify);
+            inputs["waitForNodeReady"] = pulumi.output(args ? args.waitForNodeReady : undefined).apply(JSON.stringify);
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});
@@ -48,7 +55,35 @@ export class Provider extends pulumi.ProviderResource {
  */
 export interface ProviderArgs {
     /**
-     * Provider to use. Default: docker
+     * Kind config file to use. Optional
+     */
+    configFile?: pulumi.Input<string>;
+    /**
+     * File to save generated kubeconfig. Default: not set. Optional
+     */
+    kubeconfigFile?: pulumi.Input<string>;
+    /**
+     * Node image to use. Optional
+     */
+    nodeImage?: pulumi.Input<string>;
+    /**
+     * Provider to use. Supports docker/podman. Default: docker. Optional
      */
     provider?: pulumi.Input<string>;
+    /**
+     * Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
+     */
+    retainNodesOnFailure?: pulumi.Input<boolean>;
+    /**
+     * Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
+     */
+    stopBeforeSettingK8s?: pulumi.Input<boolean>;
+    /**
+     * Whether to use v1alpha4 KIND api. Default: false. Optional
+     */
+    usev1Alpha?: pulumi.Input<boolean>;
+    /**
+     * Time in seconds to wait for nodes to become ready. Default: none. Optional
+     */
+    waitForNodeReady?: pulumi.Input<number>;
 }

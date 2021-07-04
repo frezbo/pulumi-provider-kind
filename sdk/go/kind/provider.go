@@ -31,14 +31,42 @@ func NewProvider(ctx *pulumi.Context,
 }
 
 type providerArgs struct {
-	// Provider to use. Default: docker
+	// Kind config file to use. Optional
+	ConfigFile *string `pulumi:"configFile"`
+	// File to save generated kubeconfig. Default: not set. Optional
+	KubeconfigFile *string `pulumi:"kubeconfigFile"`
+	// Node image to use. Optional
+	NodeImage *string `pulumi:"nodeImage"`
+	// Provider to use. Supports docker/podman. Default: docker. Optional
 	Provider *string `pulumi:"provider"`
+	// Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
+	RetainNodesOnFailure *bool `pulumi:"retainNodesOnFailure"`
+	// Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
+	StopBeforeSettingK8s *bool `pulumi:"stopBeforeSettingK8s"`
+	// Whether to use v1alpha4 KIND api. Default: false. Optional
+	Usev1Alpha *bool `pulumi:"usev1Alpha"`
+	// Time in seconds to wait for nodes to become ready. Default: none. Optional
+	WaitForNodeReady *int `pulumi:"waitForNodeReady"`
 }
 
 // The set of arguments for constructing a Provider resource.
 type ProviderArgs struct {
-	// Provider to use. Default: docker
+	// Kind config file to use. Optional
+	ConfigFile pulumi.StringPtrInput
+	// File to save generated kubeconfig. Default: not set. Optional
+	KubeconfigFile pulumi.StringPtrInput
+	// Node image to use. Optional
+	NodeImage pulumi.StringPtrInput
+	// Provider to use. Supports docker/podman. Default: docker. Optional
 	Provider pulumi.StringPtrInput
+	// Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
+	RetainNodesOnFailure pulumi.BoolPtrInput
+	// Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
+	StopBeforeSettingK8s pulumi.BoolPtrInput
+	// Whether to use v1alpha4 KIND api. Default: false. Optional
+	Usev1Alpha pulumi.BoolPtrInput
+	// Time in seconds to wait for nodes to become ready. Default: none. Optional
+	WaitForNodeReady pulumi.IntPtrInput
 }
 
 func (ProviderArgs) ElementType() reflect.Type {

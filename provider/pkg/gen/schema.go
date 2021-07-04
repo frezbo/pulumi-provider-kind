@@ -25,9 +25,37 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 
 		Config: schema.ConfigSpec{
 			Variables: map[string]schema.PropertySpec{
+				"configFile": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "Kind config file to use. Optional",
+				},
+				"kubeconfigFile": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "File to save generated kubeconfig. Default: not set. Optional",
+				},
+				"nodeImage": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "Node image to use. Optional",
+				},
 				"provider": {
 					TypeSpec:    schema.TypeSpec{Type: "string"},
-					Description: "Provider to use. Default: docker",
+					Description: "Provider to use. Supports docker/podman. Default: docker. Optional",
+				},
+				"retainNodesOnFailure": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional",
+				},
+				"stopBeforeSettingK8s": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional",
+				},
+				"usev1Alpha": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Whether to use v1alpha4 KIND api. Default: false. Optional",
+				},
+				"waitForNodeReady": {
+					TypeSpec:    schema.TypeSpec{Type: "integer"},
+					Description: "Time in seconds to wait for nodes to become ready. Default: none. Optional",
 				},
 			},
 		},
@@ -37,9 +65,37 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 				Type:        "object",
 			},
 			InputProperties: map[string]schema.PropertySpec{
+				"configFile": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "Kind config file to use. Optional",
+				},
+				"kubeconfigFile": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "File to save generated kubeconfig. Default: not set. Optional",
+				},
+				"nodeImage": {
+					TypeSpec:    schema.TypeSpec{Type: "string"},
+					Description: "Node image to use. Optional",
+				},
 				"provider": {
 					TypeSpec:    schema.TypeSpec{Type: "string"},
-					Description: "Provider to use. Default: docker",
+					Description: "Provider to use. Supports docker/podman. Default: docker. Optional",
+				},
+				"retainNodesOnFailure": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional",
+				},
+				"stopBeforeSettingK8s": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional",
+				},
+				"usev1Alpha": {
+					TypeSpec:    schema.TypeSpec{Type: "boolean"},
+					Description: "Whether to use v1alpha4 KIND api. Default: false. Optional",
+				},
+				"waitForNodeReady": {
+					TypeSpec:    schema.TypeSpec{Type: "integer"},
+					Description: "Time in seconds to wait for nodes to become ready. Default: none. Optional",
 				},
 			},
 		},
@@ -91,9 +147,12 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 				}
 
 				resourceSpec.InputProperties[definitionPropertyKey] = resourceInputProperty
+				// resourceSpec.Properties[definitionPropertyKey] = resourceInputProperty
+
+				// define outputs for the kind cluster
 				if defintion == kindClusterDefinition {
 					resourceSpec.Properties["kubeconfig"] = schema.PropertySpec{
-						Description: "KubeConfig",
+						Description: "kubeconfig content",
 						TypeSpec: schema.TypeSpec{
 							Type: "string",
 						},
