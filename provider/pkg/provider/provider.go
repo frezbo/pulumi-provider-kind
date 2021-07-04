@@ -39,6 +39,8 @@ import (
 
 const (
 	kindDefaultProvider = "docker"
+	kindDockerProvider  = "docker"
+	kindPodmanProvider  = "podman"
 )
 
 type cancellationContext struct {
@@ -128,8 +130,8 @@ func (k *kindProvider) CheckConfig(ctx context.Context, req *rpc.CheckRequest) (
 
 	if providerValueSet {
 		switch news["provider"].StringValue() {
-		case "docker":
-		case "podman":
+		case kindDockerProvider:
+		case kindPodmanProvider:
 		default:
 			failures = append(failures, &rpc.CheckFailure{
 				Property: "provider",
@@ -165,7 +167,7 @@ func (k *kindProvider) DiffConfig(ctx context.Context, req *rpc.DiffRequest) (*r
 		return nil, errors.Wrapf(err, "DiffConfig failed because of malformed resource inputs")
 	}
 
-	// any provider chnages creates a new kind cluster
+	// any provider changes creates a new kind cluster
 	if d := olds.Diff(news); d != nil {
 		return &rpc.DiffResponse{
 			Changes: rpc.DiffResponse_DIFF_SOME,
@@ -381,9 +383,9 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 	var kindProviderOption cluster.ProviderOption
 
 	switch k.opts.Provider {
-	case "docker":
+	case kindDockerProvider:
 		kindProviderOption = cluster.ProviderWithDocker()
-	case "podman":
+	case kindPodmanProvider:
 		kindProviderOption = cluster.ProviderWithPodman()
 	}
 
@@ -409,7 +411,7 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 		return &rpc.CreateResponse{Properties: outputProperties}, nil
 	}
 
-	logger := logging.NewLogger(k.host, k.canceler.context, urn)
+	logger := logging.NewLogger(k.canceler.context, k.host, urn)
 
 	kindProviderConfig := cluster.NewProvider(kindProviderOption, cluster.ProviderWithLogger(logger))
 
@@ -449,6 +451,7 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 			// without checking for errors. It's up to the user to cleanup
 			// kind clusters that may have been orphaned due to some serious
 			// config issues/weird edge cases
+			// nolint:errcheck
 			kindProviderConfig.Delete(clusterName, k.opts.KubeconfigFile)
 		}
 		return nil, err
@@ -508,13 +511,13 @@ func (k *kindProvider) Delete(ctx context.Context, req *rpc.DeleteRequest) (*pbe
 	var kindProviderOption cluster.ProviderOption
 
 	switch k.opts.Provider {
-	case "docker":
+	case kindDockerProvider:
 		kindProviderOption = cluster.ProviderWithDocker()
-	case "podman":
+	case kindPodmanProvider:
 		kindProviderOption = cluster.ProviderWithPodman()
 	}
 
-	logger := logging.NewLogger(k.host, k.canceler.context, urn)
+	logger := logging.NewLogger(k.canceler.context, k.host, urn)
 	provider := cluster.NewProvider(kindProviderOption, cluster.ProviderWithLogger(logger))
 	if err := provider.Delete(req.Id, k.opts.KubeconfigFile); err != nil {
 		return &pbempty.Empty{}, err
