@@ -44,7 +44,7 @@ type Logger struct {
 }
 
 // NewLogger returns a new Logger with the given verbosity
-func NewLogger(logger *provider.HostClient, context context.Context, urn resource.URN) *Logger {
+func NewLogger(context context.Context, logger *provider.HostClient, urn resource.URN) *Logger {
 	l := &Logger{
 		verbosity:  0,
 		bufferPool: newBufferPool(),
@@ -96,6 +96,7 @@ func (l *Logger) writeBuffer(buf *bytes.Buffer) {
 	// TODO: should we handle this somehow??
 	// Who logs for the logger? 🤔
 	_, _ = l.write(buf.Bytes())
+	// nolint:errcheck
 	l.host.LogStatus(l.context, diag.Info, l.urn, string(buf.Bytes()))
 }
 
