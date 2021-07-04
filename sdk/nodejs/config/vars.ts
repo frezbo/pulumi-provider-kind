@@ -7,6 +7,34 @@ import * as utilities from "../utilities";
 let __config = new pulumi.Config("kind");
 
 /**
- * Provider to use. Default: docker
+ * Kind config file to use. Optional
+ */
+export let configFile: string | undefined = __config.get("configFile");
+/**
+ * File to save generated kubeconfig. Default: not set. Optional
+ */
+export let kubeconfigFile: string | undefined = __config.get("kubeconfigFile");
+/**
+ * Node image to use. Optional
+ */
+export let nodeImage: string | undefined = __config.get("nodeImage");
+/**
+ * Provider to use. Supports docker/podman. Default: docker. Optional
  */
 export let provider: string | undefined = __config.get("provider");
+/**
+ * Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
+ */
+export let retainNodesOnFailure: boolean | undefined = __config.getObject<boolean>("retainNodesOnFailure");
+/**
+ * Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
+ */
+export let stopBeforeSettingK8s: boolean | undefined = __config.getObject<boolean>("stopBeforeSettingK8s");
+/**
+ * Whether to use v1alpha4 KIND api. Default: false. Optional
+ */
+export let usev1Alpha: boolean | undefined = __config.getObject<boolean>("usev1Alpha");
+/**
+ * Time in seconds to wait for nodes to become ready. Default: none. Optional
+ */
+export let waitForNodeReady: number | undefined = __config.getObject<number>("waitForNodeReady");

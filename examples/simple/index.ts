@@ -1,5 +1,5 @@
-import * as xyz from "../../sdk/nodejs";
+import * as kind from "../../sdk/nodejs";
 
-const random = new xyz.Random("my-random", { length: 24 });
+const cluster = new kind.Cluster("kind-example", {})
 
-export const output = random.result;
+export const kubeconfig = cluster.kubeconfig;

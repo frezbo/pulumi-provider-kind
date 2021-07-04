@@ -8,7 +8,42 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
-// Provider to use. Default: docker
+// Kind config file to use. Optional
+func GetConfigFile(ctx *pulumi.Context) string {
+	return config.Get(ctx, "kind:configFile")
+}
+
+// File to save generated kubeconfig. Default: not set. Optional
+func GetKubeconfigFile(ctx *pulumi.Context) string {
+	return config.Get(ctx, "kind:kubeconfigFile")
+}
+
+// Node image to use. Optional
+func GetNodeImage(ctx *pulumi.Context) string {
+	return config.Get(ctx, "kind:nodeImage")
+}
+
+// Provider to use. Supports docker/podman. Default: docker. Optional
 func GetProvider(ctx *pulumi.Context) string {
 	return config.Get(ctx, "kind:provider")
+}
+
+// Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
+func GetRetainNodesOnFailure(ctx *pulumi.Context) bool {
+	return config.GetBool(ctx, "kind:retainNodesOnFailure")
+}
+
+// Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
+func GetStopBeforeSettingK8s(ctx *pulumi.Context) bool {
+	return config.GetBool(ctx, "kind:stopBeforeSettingK8s")
+}
+
+// Whether to use v1alpha4 KIND api. Default: false. Optional
+func GetUsev1Alpha(ctx *pulumi.Context) bool {
+	return config.GetBool(ctx, "kind:usev1Alpha")
+}
+
+// Time in seconds to wait for nodes to become ready. Default: none. Optional
+func GetWaitForNodeReady(ctx *pulumi.Context) int {
+	return config.GetInt(ctx, "kind:waitForNodeReady")
 }

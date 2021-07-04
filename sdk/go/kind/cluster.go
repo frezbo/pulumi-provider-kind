@@ -14,7 +14,7 @@ import (
 type Cluster struct {
 	pulumi.CustomResourceState
 
-	// KubeConfig
+	// kubeconfig content
 	Kubeconfig pulumi.StringOutput `pulumi:"kubeconfig"`
 }
 
@@ -47,12 +47,12 @@ func GetCluster(ctx *pulumi.Context,
 
 // Input properties used for looking up and filtering Cluster resources.
 type clusterState struct {
-	// KubeConfig
+	// kubeconfig content
 	Kubeconfig *string `pulumi:"kubeconfig"`
 }
 
 type ClusterState struct {
-	// KubeConfig
+	// kubeconfig content
 	Kubeconfig pulumi.StringPtrInput
 }
 

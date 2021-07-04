@@ -6,12 +6,12 @@ linters:
     - errcheck
     - goconst
     - gofmt
-    - golint
     - gosec
     - govet
     - ineffassign
     - misspell
     - nakedret
+    - revive
     - structcheck
     - unconvert
     - varcheck

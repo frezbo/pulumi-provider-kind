@@ -24,7 +24,7 @@ import (
 func Serve(providerName, version string) {
 	// Start gRPC service.
 	err := provider.Main(providerName, func(host *provider.HostClient) (rpc.ResourceProviderServer, error) {
-		return makeProvider(host, providerName, version)
+		return makeKindProvider(host, providerName, version)
 	})
 	if err != nil {
 		cmdutil.ExitError(err.Error())
