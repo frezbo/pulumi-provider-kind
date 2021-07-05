@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Copied and modified from https://github.com/pulumi/pulumi-kubernetes/blob/v3.5.0/provider/pkg/metadata/naming.go
 package metadata
 
 import (
