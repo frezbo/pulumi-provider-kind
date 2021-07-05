@@ -43,8 +43,6 @@ type providerArgs struct {
 	RetainNodesOnFailure *bool `pulumi:"retainNodesOnFailure"`
 	// Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
 	StopBeforeSettingK8s *bool `pulumi:"stopBeforeSettingK8s"`
-	// Whether to use v1alpha4 KIND api. Default: false. Optional
-	Usev1Alpha *bool `pulumi:"usev1Alpha"`
 	// Time in seconds to wait for nodes to become ready. Default: none. Optional
 	WaitForNodeReady *int `pulumi:"waitForNodeReady"`
 }
@@ -63,8 +61,6 @@ type ProviderArgs struct {
 	RetainNodesOnFailure pulumi.BoolPtrInput
 	// Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
 	StopBeforeSettingK8s pulumi.BoolPtrInput
-	// Whether to use v1alpha4 KIND api. Default: false. Optional
-	Usev1Alpha pulumi.BoolPtrInput
 	// Time in seconds to wait for nodes to become ready. Default: none. Optional
 	WaitForNodeReady pulumi.IntPtrInput
 }

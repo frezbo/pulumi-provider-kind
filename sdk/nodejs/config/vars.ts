@@ -31,10 +31,6 @@ export let retainNodesOnFailure: boolean | undefined = __config.getObject<boolea
  */
 export let stopBeforeSettingK8s: boolean | undefined = __config.getObject<boolean>("stopBeforeSettingK8s");
 /**
- * Whether to use v1alpha4 KIND api. Default: false. Optional
- */
-export let usev1Alpha: boolean | undefined = __config.getObject<boolean>("usev1Alpha");
-/**
  * Time in seconds to wait for nodes to become ready. Default: none. Optional
  */
 export let waitForNodeReady: number | undefined = __config.getObject<number>("waitForNodeReady");
