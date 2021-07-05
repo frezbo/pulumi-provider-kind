@@ -34,10 +34,6 @@
                 "type": "boolean",
                 "description": "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional"
             },
-            "usev1Alpha": {
-                "type": "boolean",
-                "description": "Whether to use v1alpha4 KIND api. Default: false. Optional"
-            },
             "waitForNodeReady": {
                 "type": "integer",
                 "description": "Time in seconds to wait for nodes to become ready. Default: none. Optional"
@@ -250,10 +246,6 @@
             "stopBeforeSettingK8s": {
                 "type": "boolean",
                 "description": "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional"
-            },
-            "usev1Alpha": {
-                "type": "boolean",
-                "description": "Whether to use v1alpha4 KIND api. Default: false. Optional"
             },
             "waitForNodeReady": {
                 "type": "integer",

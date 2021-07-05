@@ -7,11 +7,7 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		cluster, err := kind.NewCluster(ctx, "kind-example", &kind.ClusterArgs{
-			Networking: kind.NetworkingTypeArgs{
-				DisableDefaultCNI: pulumi.Bool(true),
-			},
-		})
+		cluster, err := kind.NewCluster(ctx, "kind-example", &kind.ClusterArgs{})
 		if err != nil {
 			return err
 		}

@@ -65,9 +65,9 @@ type kindProvider struct {
 }
 
 // Partial create options from https://pkg.go.dev/sigs.k8s.io/kind@v0.11.1/pkg/cluster
+// Using v1alpha4 schema as default
 type kindCreateOpts struct {
 	ConfigFile           string
-	UseV1Alpha           bool
 	NodeImage            string
 	RetainNodesOnFailure bool
 	WaitForNodeReady     time.Duration
@@ -211,11 +211,6 @@ func (k *kindProvider) Configure(_ context.Context, req *rpc.ConfigureRequest) (
 		k.opts.StopBeforeSettingK8s = stopBeforeSettingK8s == trueStr
 	} else {
 		k.opts.StopBeforeSettingK8s = false
-	}
-	if useV1Alpha, exists := vars["kind:config:usev1Alpha"]; exists {
-		k.opts.UseV1Alpha = useV1Alpha == trueStr
-	} else {
-		k.opts.UseV1Alpha = false
 	}
 	if waitForNodeReady, exists := vars["kind:config:waitForNodeReady"]; exists {
 		waitDuration, _ := strconv.Atoi(waitForNodeReady)
@@ -432,16 +427,8 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 	if k.opts.StopBeforeSettingK8s {
 		kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithStopBeforeSettingUpKubernetes(k.opts.StopBeforeSettingK8s))
 	}
-	if k.opts.UseV1Alpha {
-		kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithV1Alpha4Config(clusterConfig))
-	} else {
-		clusterConfigData, err := json.Marshal(clusterConfig)
-		if err != nil {
-			return nil, err
-		}
-		kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithRawConfig(clusterConfigData))
-	}
 
+	kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithV1Alpha4Config(clusterConfig))
 	kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithWaitForReady(k.opts.WaitForNodeReady))
 
 	if err = kindProviderConfig.Create(clusterName, kindClusterCreateOptions...); err != nil {

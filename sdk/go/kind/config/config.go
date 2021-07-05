@@ -38,11 +38,6 @@ func GetStopBeforeSettingK8s(ctx *pulumi.Context) bool {
 	return config.GetBool(ctx, "kind:stopBeforeSettingK8s")
 }
 
-// Whether to use v1alpha4 KIND api. Default: false. Optional
-func GetUsev1Alpha(ctx *pulumi.Context) bool {
-	return config.GetBool(ctx, "kind:usev1Alpha")
-}
-
 // Time in seconds to wait for nodes to become ready. Default: none. Optional
 func GetWaitForNodeReady(ctx *pulumi.Context) int {
 	return config.GetInt(ctx, "kind:waitForNodeReady")

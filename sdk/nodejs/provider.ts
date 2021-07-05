@@ -40,7 +40,6 @@ export class Provider extends pulumi.ProviderResource {
             inputs["provider"] = args ? args.provider : undefined;
             inputs["retainNodesOnFailure"] = pulumi.output(args ? args.retainNodesOnFailure : undefined).apply(JSON.stringify);
             inputs["stopBeforeSettingK8s"] = pulumi.output(args ? args.stopBeforeSettingK8s : undefined).apply(JSON.stringify);
-            inputs["usev1Alpha"] = pulumi.output(args ? args.usev1Alpha : undefined).apply(JSON.stringify);
             inputs["waitForNodeReady"] = pulumi.output(args ? args.waitForNodeReady : undefined).apply(JSON.stringify);
         }
         if (!opts.version) {
@@ -78,10 +77,6 @@ export interface ProviderArgs {
      * Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
      */
     stopBeforeSettingK8s?: pulumi.Input<boolean>;
-    /**
-     * Whether to use v1alpha4 KIND api. Default: false. Optional
-     */
-    usev1Alpha?: pulumi.Input<boolean>;
     /**
      * Time in seconds to wait for nodes to become ready. Default: none. Optional
      */

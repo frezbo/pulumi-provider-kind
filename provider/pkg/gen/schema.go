@@ -49,10 +49,6 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 					TypeSpec:    schema.TypeSpec{Type: "boolean"},
 					Description: "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional",
 				},
-				"usev1Alpha": {
-					TypeSpec:    schema.TypeSpec{Type: "boolean"},
-					Description: "Whether to use v1alpha4 KIND api. Default: false. Optional",
-				},
 				"waitForNodeReady": {
 					TypeSpec:    schema.TypeSpec{Type: "integer"},
 					Description: "Time in seconds to wait for nodes to become ready. Default: none. Optional",
@@ -88,10 +84,6 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 				"stopBeforeSettingK8s": {
 					TypeSpec:    schema.TypeSpec{Type: "boolean"},
 					Description: "Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional",
-				},
-				"usev1Alpha": {
-					TypeSpec:    schema.TypeSpec{Type: "boolean"},
-					Description: "Whether to use v1alpha4 KIND api. Default: false. Optional",
 				},
 				"waitForNodeReady": {
 					TypeSpec:    schema.TypeSpec{Type: "integer"},
