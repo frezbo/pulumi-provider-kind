@@ -188,13 +188,13 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 						"kubeconfig",
 						"name",
 					}
-					// resourceSpec.ObjectTypeSpec.Properties[definitionPropertyKey] = resourceInputProperty
+
 					// let's only expose the kind cluster resource
 					pkg.Resources[tok] = resourceSpec
 					continue
 				}
 				if defintion == kindNodeDefinition {
-					// let's add some constans for the node role type
+					// let's add some constants for the node role type
 					// example copied from: https://github.com/pulumi/pulumi-kubernetes/blob/0072954b2cdf088fc2e336ca4c289929f75ec1a5/provider/pkg/gen/overlays.go
 					typeSpec.Properties["role"] = schema.PropertySpec{
 						Description: "node role type",
