@@ -87,6 +87,12 @@ func makeKindProvider(host *provider.HostClient, name, version string) (rpc.Reso
 	}, nil
 }
 
+// added as part of pulumi sdk upgrade to v3.6
+// not sure what Call does
+func (k *kindProvider) Call(ctx context.Context, call *rpc.CallRequest) (*rpc.CallResponse, error) {
+	return nil, nil
+}
+
 // CheckConfig validates the configuration for this provider.
 func (k *kindProvider) CheckConfig(ctx context.Context, req *rpc.CheckRequest) (*rpc.CheckResponse, error) {
 	urn := resource.URN(req.GetUrn())
@@ -391,6 +397,7 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 	}
 
 	clusterName := clusterConfig.Name
+	newInputsMap["name"] = clusterName
 
 	if req.GetPreview() {
 
@@ -476,7 +483,7 @@ func (k *kindProvider) Read(ctx context.Context, req *rpc.ReadRequest) (*rpc.Rea
 	label := fmt.Sprintf("%s.Read(%s)", k.name, urn)
 	pulumilog.V(9).Infof("%s executing", label)
 
-	panic("Read not implemented for 'kind:index:Cluster'")
+	panic("Read not implemented for 'kind:cluster:Cluster'")
 }
 
 // Update updates an existing resource with new values.

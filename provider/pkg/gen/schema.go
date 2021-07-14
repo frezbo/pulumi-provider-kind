@@ -22,11 +22,13 @@ import (
 
 	"github.com/alecthomas/jsonschema"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
-	"github.com/pulumi/pulumi/sdk/go/common/util/contract"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
+	kindconstants "sigs.k8s.io/kind/pkg/cluster/constants"
 )
 
 const (
 	kindClusterDefinition = "Cluster"
+	kindNodeDefinition    = "Node"
 )
 
 func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
@@ -118,7 +120,9 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 
 	for defintion, definitionProperties := range swagger.Definitions {
 
-		tok := fmt.Sprintf("kind:index:%s", defintion)
+		defintionSmallCased := strings.ToLower(defintion)
+
+		tok := fmt.Sprintf("kind:%s:%s", defintionSmallCased, defintion)
 
 		objectSpec := schema.ObjectTypeSpec{
 			Description: fmt.Sprintf("KIND %s", defintion),
@@ -133,7 +137,7 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 			RequiredInputs:  definitionProperties.Required,
 		}
 
-		pkgImportAliases[fmt.Sprintf("%s/%s", goImportPath, defintion)] = defintion
+		pkgImportAliases[fmt.Sprintf("%s/%s", goImportPath, defintionSmallCased)] = defintionSmallCased
 
 		for _, definitionPropertyKey := range definitionProperties.Properties.Keys() {
 			if val, ok := definitionProperties.Properties.Get(definitionPropertyKey); ok {
@@ -154,7 +158,15 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 				}
 
 				resourceSpec.InputProperties[definitionPropertyKey] = resourceInputProperty
-				// resourceSpec.Properties[definitionPropertyKey] = resourceInputProperty
+
+				typeSpec := schema.ComplexTypeSpec{
+					ObjectTypeSpec: schema.ObjectTypeSpec{
+						Description: fmt.Sprintf("KIND %s type", defintion),
+						Type:        "object",
+						Properties:  resourceSpec.InputProperties,
+						Language:    map[string]json.RawMessage{},
+					},
+				}
 
 				// define outputs for the kind cluster
 				if defintion == kindClusterDefinition {
@@ -164,17 +176,64 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 							Type: "string",
 						},
 					}
-					resourceSpec.Required = []string{"kubeconfig"}
+
+					resourceSpec.Properties["name"] = schema.PropertySpec{
+						Description: "cluster name",
+						TypeSpec: schema.TypeSpec{
+							Type: "string",
+						},
+					}
+
+					resourceSpec.Required = []string{
+						"kubeconfig",
+						"name",
+					}
+					// resourceSpec.ObjectTypeSpec.Properties[definitionPropertyKey] = resourceInputProperty
+					// let's only expose the kind cluster resource
+					pkg.Resources[tok] = resourceSpec
+					continue
 				}
-				pkg.Resources[tok] = resourceSpec
-				pkg.Types[tok] = schema.ComplexTypeSpec{
-					ObjectTypeSpec: schema.ObjectTypeSpec{
-						Description: fmt.Sprintf("KIND %s type", definitionPropertyKey),
-						Type:        "object",
-						Properties:  resourceSpec.InputProperties,
-						Language:    map[string]json.RawMessage{},
-					},
+				if defintion == kindNodeDefinition {
+					// let's add some constans for the node role type
+					// example copied from: https://github.com/pulumi/pulumi-kubernetes/blob/0072954b2cdf088fc2e336ca4c289929f75ec1a5/provider/pkg/gen/overlays.go
+					typeSpec.Properties["role"] = schema.PropertySpec{
+						Description: "node role type",
+						TypeSpec: schema.TypeSpec{
+							OneOf: []schema.TypeSpec{
+								{
+									Type: "string",
+								},
+								{
+									Type: "string",
+									Ref:  "#types/kind:node:RoleType",
+								},
+							},
+						},
+					}
+					pkg.Types["kind:node:RoleType"] = schema.ComplexTypeSpec{
+						ObjectTypeSpec: schema.ObjectTypeSpec{
+							Type: "string",
+						},
+						Enum: []schema.EnumValueSpec{
+							{
+								Name:        "ControlPlane",
+								Value:       kindconstants.ControlPlaneNodeRoleValue,
+								Description: "node that hosts Kubernetes control-plane components",
+							},
+							{
+								Name:        "Worker",
+								Value:       kindconstants.WorkerNodeRoleValue,
+								Description: "node that hosts Kubernetes worker",
+							},
+							{
+								Name:        "LoadBalancer",
+								Value:       kindconstants.ExternalLoadBalancerNodeRoleValue,
+								Description: "node that hosts an external load balancer",
+							},
+						},
+					}
 				}
+				pkg.Types[tok] = typeSpec
 			}
 		}
 
@@ -211,7 +270,7 @@ func openAPISpecRefToPulumiRef(ref string) string {
 		// remove `definitions` and replace by `types`
 		// ref: https://www.pulumi.com/docs/guides/pulumi-packages/schema/#
 		ref = strings.ReplaceAll(ref, "#/definitions/", "")
-		ref = fmt.Sprintf("%s/kind:index:%s", "#/types", ref)
+		ref = fmt.Sprintf("%s/kind:%s:%s", "#/types", strings.ToLower(ref), ref)
 		return ref
 	}
 	return ref

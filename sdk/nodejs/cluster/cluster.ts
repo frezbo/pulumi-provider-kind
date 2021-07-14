@@ -2,8 +2,8 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import { input as inputs, output as outputs } from "./types";
-import * as utilities from "./utilities";
+import { input as inputs, output as outputs, enums } from "../types";
+import * as utilities from "../utilities";
 
 /**
  * KIND Cluster
@@ -22,7 +22,7 @@ export class Cluster extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kind:index:Cluster';
+    public static readonly __pulumiType = 'kind:cluster:Cluster';
 
     /**
      * Returns true if the given object is an instance of Cluster.  This is designed to work even
@@ -39,6 +39,10 @@ export class Cluster extends pulumi.CustomResource {
      * kubeconfig content
      */
     public /*out*/ readonly kubeconfig!: pulumi.Output<string>;
+    /**
+     * cluster name
+     */
+    public readonly name!: pulumi.Output<string>;
 
     /**
      * Create a Cluster resource with the given unique name, arguments, and options.
@@ -65,6 +69,7 @@ export class Cluster extends pulumi.CustomResource {
             inputs["kubeconfig"] = undefined /*out*/;
         } else {
             inputs["kubeconfig"] = undefined /*out*/;
+            inputs["name"] = undefined /*out*/;
         }
         if (!opts.version) {
             opts = pulumi.mergeOptions(opts, { version: utilities.getVersion()});
@@ -83,9 +88,9 @@ export interface ClusterArgs {
     featureGates?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     kind?: pulumi.Input<string>;
     kubeadmConfigPatches?: pulumi.Input<pulumi.Input<string>[]>;
-    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902Args>[]>;
+    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.patchjson6902.PatchJSON6902Args>[]>;
     name?: pulumi.Input<string>;
-    networking?: pulumi.Input<inputs.NetworkingArgs>;
-    nodes?: pulumi.Input<pulumi.Input<inputs.NodeArgs>[]>;
+    networking?: pulumi.Input<inputs.networking.NetworkingArgs>;
+    nodes?: pulumi.Input<pulumi.Input<inputs.node.NodeArgs>[]>;
     runtimeConfig?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
 }

@@ -5,53 +5,20 @@ import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "./utilities";
 
 // Export members:
-export * from "./cluster";
-export * from "./mount";
-export * from "./networking";
-export * from "./node";
-export * from "./patchJSON6902";
-export * from "./portMapping";
 export * from "./provider";
 
 // Export sub-modules:
+import * as cluster from "./cluster";
 import * as config from "./config";
+import * as node from "./node";
 import * as types from "./types";
 
 export {
+    cluster,
     config,
+    node,
     types,
 };
-
-// Import resources to register:
-import { Cluster } from "./cluster";
-import { Mount } from "./mount";
-import { Networking } from "./networking";
-import { Node } from "./node";
-import { PatchJSON6902 } from "./patchJSON6902";
-import { PortMapping } from "./portMapping";
-
-const _module = {
-    version: utilities.getVersion(),
-    construct: (name: string, type: string, urn: string): pulumi.Resource => {
-        switch (type) {
-            case "kind:index:Cluster":
-                return new Cluster(name, <any>undefined, { urn })
-            case "kind:index:Mount":
-                return new Mount(name, <any>undefined, { urn })
-            case "kind:index:Networking":
-                return new Networking(name, <any>undefined, { urn })
-            case "kind:index:Node":
-                return new Node(name, <any>undefined, { urn })
-            case "kind:index:PatchJSON6902":
-                return new PatchJSON6902(name, <any>undefined, { urn })
-            case "kind:index:PortMapping":
-                return new PortMapping(name, <any>undefined, { urn })
-            default:
-                throw new Error(`unknown resource type ${type}`);
-        }
-    },
-};
-pulumi.runtime.registerResourceModule("kind", "index", _module)
 
 import { Provider } from "./provider";
 

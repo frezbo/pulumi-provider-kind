@@ -41,62 +41,8 @@
         }
     },
     "types": {
-        "kind:index:Cluster": {
-            "description": "KIND containerdConfigPatchesJSON6902 type",
-            "properties": {
-                "apiVersion": {
-                    "type": "string"
-                },
-                "containerdConfigPatches": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "containerdConfigPatchesJSON6902": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "featureGates": {
-                    "type": "object"
-                },
-                "kind": {
-                    "type": "string"
-                },
-                "kubeadmConfigPatches": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "kubeadmConfigPatchesJSON6902": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/types/kind:index:PatchJSON6902"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "networking": {
-                    "$ref": "#/types/kind:index:Networking"
-                },
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/types/kind:index:Node"
-                    }
-                },
-                "runtimeConfig": {
-                    "type": "object"
-                }
-            },
-            "type": "object"
-        },
-        "kind:index:Mount": {
-            "description": "KIND propagation type",
+        "kind:mount:Mount": {
+            "description": "KIND Mount type",
             "properties": {
                 "containerPath": {
                     "type": "string"
@@ -116,8 +62,8 @@
             },
             "type": "object"
         },
-        "kind:index:Networking": {
-            "description": "KIND kubeProxyMode type",
+        "kind:networking:Networking": {
+            "description": "KIND Networking type",
             "properties": {
                 "apiServerAddress": {
                     "type": "string"
@@ -143,19 +89,19 @@
             },
             "type": "object"
         },
-        "kind:index:Node": {
-            "description": "KIND kubeadmConfigPatchesJSON6902 type",
+        "kind:node:Node": {
+            "description": "KIND Node type",
             "properties": {
                 "extraMounts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/types/kind:index:Mount"
+                        "$ref": "#/types/kind:mount:Mount"
                     }
                 },
                 "extraPortMappings": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/types/kind:index:PortMapping"
+                        "$ref": "#/types/kind:portmapping:PortMapping"
                     }
                 },
                 "image": {
@@ -170,20 +116,49 @@
                 "kubeadmConfigPatchesJSON6902": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/types/kind:index:PatchJSON6902"
+                        "$ref": "#/types/kind:patchjson6902:PatchJSON6902"
                     }
                 },
                 "labels": {
                     "type": "object"
                 },
                 "role": {
-                    "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "string",
+                            "$ref": "#types/kind:node:RoleType"
+                        }
+                    ],
+                    "description": "node role type"
                 }
             },
             "type": "object"
         },
-        "kind:index:PatchJSON6902": {
-            "description": "KIND patch type",
+        "kind:node:RoleType": {
+            "type": "string",
+            "enum": [
+                {
+                    "name": "ControlPlane",
+                    "description": "node that hosts Kubernetes control-plane components",
+                    "value": "control-plane"
+                },
+                {
+                    "name": "Worker",
+                    "description": "node that hosts Kubernetes worker",
+                    "value": "worker"
+                },
+                {
+                    "name": "LoadBalancer",
+                    "description": "node that hosts an external load balancer",
+                    "value": "external-load-balancer"
+                }
+            ]
+        },
+        "kind:patchjson6902:PatchJSON6902": {
+            "description": "KIND PatchJSON6902 type",
             "properties": {
                 "group": {
                     "type": "string"
@@ -200,8 +175,8 @@
             },
             "type": "object"
         },
-        "kind:index:PortMapping": {
-            "description": "KIND protocol type",
+        "kind:portmapping:PortMapping": {
+            "description": "KIND PortMapping type",
             "properties": {
                 "containerPort": {
                     "type": "integer"
@@ -254,17 +229,22 @@
         }
     },
     "resources": {
-        "kind:index:Cluster": {
+        "kind:cluster:Cluster": {
             "description": "KIND Cluster",
             "properties": {
                 "kubeconfig": {
                     "type": "string",
                     "description": "kubeconfig content"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "cluster name"
                 }
             },
             "type": "object",
             "required": [
-                "kubeconfig"
+                "kubeconfig",
+                "name"
             ],
             "inputProperties": {
                 "apiVersion": {
@@ -297,152 +277,23 @@
                 "kubeadmConfigPatchesJSON6902": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/types/kind:index:PatchJSON6902"
+                        "$ref": "#/types/kind:patchjson6902:PatchJSON6902"
                     }
                 },
                 "name": {
                     "type": "string"
                 },
                 "networking": {
-                    "$ref": "#/types/kind:index:Networking"
+                    "$ref": "#/types/kind:networking:Networking"
                 },
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/types/kind:index:Node"
+                        "$ref": "#/types/kind:node:Node"
                     }
                 },
                 "runtimeConfig": {
                     "type": "object"
-                }
-            }
-        },
-        "kind:index:Mount": {
-            "description": "KIND Mount",
-            "type": "object",
-            "inputProperties": {
-                "containerPath": {
-                    "type": "string"
-                },
-                "hostPath": {
-                    "type": "string"
-                },
-                "propagation": {
-                    "type": "string"
-                },
-                "readOnly": {
-                    "type": "boolean"
-                },
-                "selinuxRelabel": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "kind:index:Networking": {
-            "description": "KIND Networking",
-            "type": "object",
-            "inputProperties": {
-                "apiServerAddress": {
-                    "type": "string"
-                },
-                "apiServerPort": {
-                    "type": "integer"
-                },
-                "disableDefaultCNI": {
-                    "type": "boolean"
-                },
-                "ipFamily": {
-                    "type": "string"
-                },
-                "kubeProxyMode": {
-                    "type": "string"
-                },
-                "podSubnet": {
-                    "type": "string"
-                },
-                "serviceSubnet": {
-                    "type": "string"
-                }
-            }
-        },
-        "kind:index:Node": {
-            "description": "KIND Node",
-            "type": "object",
-            "inputProperties": {
-                "extraMounts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/types/kind:index:Mount"
-                    }
-                },
-                "extraPortMappings": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/types/kind:index:PortMapping"
-                    }
-                },
-                "image": {
-                    "type": "string"
-                },
-                "kubeadmConfigPatches": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "kubeadmConfigPatchesJSON6902": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/types/kind:index:PatchJSON6902"
-                    }
-                },
-                "labels": {
-                    "type": "object"
-                },
-                "role": {
-                    "type": "string"
-                }
-            }
-        },
-        "kind:index:PatchJSON6902": {
-            "description": "KIND PatchJSON6902",
-            "type": "object",
-            "inputProperties": {
-                "group": {
-                    "type": "string"
-                },
-                "kind": {
-                    "type": "string"
-                },
-                "patch": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            },
-            "requiredInputs": [
-                "group",
-                "version",
-                "kind",
-                "patch"
-            ]
-        },
-        "kind:index:PortMapping": {
-            "description": "KIND PortMapping",
-            "type": "object",
-            "inputProperties": {
-                "containerPort": {
-                    "type": "integer"
-                },
-                "hostPort": {
-                    "type": "integer"
-                },
-                "listenAddress": {
-                    "type": "string"
-                },
-                "protocol": {
-                    "type": "string"
                 }
             }
         }
@@ -452,12 +303,12 @@
             "generateResourceContainerTypes": true,
             "importBasePath": "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind",
             "packageImportAliases": {
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Cluster": "Cluster",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Mount": "Mount",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Networking": "Networking",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/Node": "Node",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/PatchJSON6902": "PatchJSON6902",
-                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/PortMapping": "PortMapping"
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/cluster": "cluster",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/mount": "mount",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/networking": "networking",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/node": "node",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/patchjson6902": "patchjson6902",
+                "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind/portmapping": "portmapping"
             }
         },
         "nodejs": {

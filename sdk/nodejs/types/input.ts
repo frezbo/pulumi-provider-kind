@@ -2,61 +2,74 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
-import { input as inputs, output as outputs } from "../types";
+import { input as inputs, output as outputs, enums } from "../types";
 
-/**
- * KIND propagation type
- */
-export interface MountArgs {
-    containerPath?: pulumi.Input<string>;
-    hostPath?: pulumi.Input<string>;
-    propagation?: pulumi.Input<string>;
-    readOnly?: pulumi.Input<boolean>;
-    selinuxRelabel?: pulumi.Input<boolean>;
+export namespace mount {
+    /**
+     * KIND Mount type
+     */
+    export interface MountArgs {
+        containerPath?: pulumi.Input<string>;
+        hostPath?: pulumi.Input<string>;
+        propagation?: pulumi.Input<string>;
+        readOnly?: pulumi.Input<boolean>;
+        selinuxRelabel?: pulumi.Input<boolean>;
+    }
 }
 
-/**
- * KIND kubeProxyMode type
- */
-export interface NetworkingArgs {
-    apiServerAddress?: pulumi.Input<string>;
-    apiServerPort?: pulumi.Input<number>;
-    disableDefaultCNI?: pulumi.Input<boolean>;
-    ipFamily?: pulumi.Input<string>;
-    kubeProxyMode?: pulumi.Input<string>;
-    podSubnet?: pulumi.Input<string>;
-    serviceSubnet?: pulumi.Input<string>;
+export namespace networking {
+    /**
+     * KIND Networking type
+     */
+    export interface NetworkingArgs {
+        apiServerAddress?: pulumi.Input<string>;
+        apiServerPort?: pulumi.Input<number>;
+        disableDefaultCNI?: pulumi.Input<boolean>;
+        ipFamily?: pulumi.Input<string>;
+        kubeProxyMode?: pulumi.Input<string>;
+        podSubnet?: pulumi.Input<string>;
+        serviceSubnet?: pulumi.Input<string>;
+    }
 }
 
-/**
- * KIND kubeadmConfigPatchesJSON6902 type
- */
-export interface NodeArgs {
-    extraMounts?: pulumi.Input<pulumi.Input<inputs.MountArgs>[]>;
-    extraPortMappings?: pulumi.Input<pulumi.Input<inputs.PortMappingArgs>[]>;
-    image?: pulumi.Input<string>;
-    kubeadmConfigPatches?: pulumi.Input<pulumi.Input<string>[]>;
-    kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.PatchJSON6902Args>[]>;
-    labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
-    role?: pulumi.Input<string>;
+export namespace node {
+    /**
+     * KIND Node type
+     */
+    export interface NodeArgs {
+        extraMounts?: pulumi.Input<pulumi.Input<inputs.mount.MountArgs>[]>;
+        extraPortMappings?: pulumi.Input<pulumi.Input<inputs.portmapping.PortMappingArgs>[]>;
+        image?: pulumi.Input<string>;
+        kubeadmConfigPatches?: pulumi.Input<pulumi.Input<string>[]>;
+        kubeadmConfigPatchesJSON6902?: pulumi.Input<pulumi.Input<inputs.patchjson6902.PatchJSON6902Args>[]>;
+        labels?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+        /**
+         * node role type
+         */
+        role?: pulumi.Input<string | enums.node.RoleType>;
+    }
 }
 
-/**
- * KIND patch type
- */
-export interface PatchJSON6902Args {
-    group?: pulumi.Input<string>;
-    kind?: pulumi.Input<string>;
-    patch?: pulumi.Input<string>;
-    version?: pulumi.Input<string>;
+export namespace patchjson6902 {
+    /**
+     * KIND PatchJSON6902 type
+     */
+    export interface PatchJSON6902Args {
+        group?: pulumi.Input<string>;
+        kind?: pulumi.Input<string>;
+        patch?: pulumi.Input<string>;
+        version?: pulumi.Input<string>;
+    }
 }
 
-/**
- * KIND protocol type
- */
-export interface PortMappingArgs {
-    containerPort?: pulumi.Input<number>;
-    hostPort?: pulumi.Input<number>;
-    listenAddress?: pulumi.Input<string>;
-    protocol?: pulumi.Input<string>;
+export namespace portmapping {
+    /**
+     * KIND PortMapping type
+     */
+    export interface PortMappingArgs {
+        containerPort?: pulumi.Input<number>;
+        hostPort?: pulumi.Input<number>;
+        listenAddress?: pulumi.Input<string>;
+        protocol?: pulumi.Input<string>;
+    }
 }
