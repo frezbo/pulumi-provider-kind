@@ -29,7 +29,7 @@ import (
 var dns1123Alphabet = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
 // AssignNameIfAutonamable generates a name for an object. Uses DNS-1123-compliant characters.
-func AssignNameIfAutonamable(obj *v1alpha4.Cluster, propMap resource.PropertyMap, base tokens.QName) {
+func AssignNameIfAutonamable(obj map[string]interface{}, propMap resource.PropertyMap, base tokens.QName) {
 	contract.Assert(base != "")
 
 	// Check if the name is set and is a computed value. If so, do not auto-name.
@@ -37,17 +37,17 @@ func AssignNameIfAutonamable(obj *v1alpha4.Cluster, propMap resource.PropertyMap
 		return
 	}
 
-	if obj.Name == "" {
-		obj.Name = fmt.Sprintf("%s-%s", base, randString(8))
+	if name, ok := obj["name"]; !ok || name.(string) == "" {
+		obj["name"] = fmt.Sprintf("%s-%s", base, randString(8))
 	}
 }
 
 // AdoptOldAutonameIfUnnamed checks if `newObj` has a name, and if not, "adopts" the name of `oldObj`
 // instead. If `oldObj` was autonamed, then we mark `newObj` as autonamed, too.
-func AdoptOldAutonameIfUnnamed(newObj, oldObj *v1alpha4.Cluster) {
+func AdoptOldAutonameIfUnnamed(newObj map[string]interface{}, oldObj *v1alpha4.Cluster) {
 	contract.Assert(oldObj.Name != "")
-	if newObj.Name == "" {
-		newObj.Name = oldObj.Name
+	if name, ok := newObj["name"]; !ok || name.(string) == "" {
+		newObj["name"] = oldObj.Name
 	}
 }
 func randString(n int) string {

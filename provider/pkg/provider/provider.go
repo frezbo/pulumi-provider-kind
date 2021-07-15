@@ -266,6 +266,8 @@ func (k *kindProvider) Check(ctx context.Context, req *rpc.CheckRequest) (*rpc.C
 		return nil, errors.Wrapf(err, "check failed because malformed resource inputs")
 	}
 
+	// old inputs means the resource has been created at-least once
+	// so we can assume the input KIND cluster config is actually valid
 	oldInputs, err := propMapToKindClusterConfig(olds.Mappable())
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to convert old inputs to kind config")
@@ -283,10 +285,10 @@ func (k *kindProvider) Check(ctx context.Context, req *rpc.CheckRequest) (*rpc.C
 		return nil, errors.Wrapf(err, "check failed because malformed resource inputs")
 	}
 
-	newInputs, err := propMapToKindClusterConfig(news.Mappable())
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to convert new inputs to kind config")
-	}
+	// we can't call `propMapToKindClusterConfig()` since we don't know if any inputs
+	// is a computed value, let's defer to validation when the actual resource is being created
+	// and only add `name` for the resource if it's missing
+	newInputs := news.Mappable()
 
 	// Adopt name from old object if appropriate.
 	//
@@ -302,12 +304,7 @@ func (k *kindProvider) Check(ctx context.Context, req *rpc.CheckRequest) (*rpc.C
 		metadata.AssignNameIfAutonamable(newInputs, news, urn.Name())
 	}
 
-	checkedWeakInputs, err := kindClusterConfigToWeaklyTyped(newInputs)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to convert kind config to inputs")
-	}
-
-	checkedInputs := resource.NewPropertyMapFromMap(checkedWeakInputs)
+	checkedInputs := resource.NewPropertyMapFromMap(newInputs)
 
 	autonamedInputs, err := plugin.MarshalProperties(checkedInputs, plugin.MarshalOptions{
 		Label:        fmt.Sprintf("%s.news", label),
@@ -391,17 +388,11 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 	}
 
 	newInputsMap := newInputs.Mappable()
-	clusterConfig, err := propMapToKindClusterConfig(newInputsMap)
-	if err != nil {
-		return nil, err
-	}
-
-	clusterName := clusterConfig.Name
-	newInputsMap["name"] = clusterName
 
 	if req.GetPreview() {
 
 		newInputsMap["kubeconfig"] = resource.Computed{}
+		newInputsMap["name"] = resource.Computed{}
 
 		outputProperties, err := plugin.MarshalProperties(
 			resource.NewPropertyMapFromMap(newInputsMap),
@@ -435,6 +426,13 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 		kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithStopBeforeSettingUpKubernetes(k.opts.StopBeforeSettingK8s))
 	}
 
+	clusterConfig, err := propMapToKindClusterConfig(newInputsMap)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Create():")
+	}
+
+	clusterName := clusterConfig.Name
+
 	kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithV1Alpha4Config(clusterConfig))
 	kindClusterCreateOptions = append(kindClusterCreateOptions, cluster.CreateWithWaitForReady(k.opts.WaitForNodeReady))
 
@@ -459,6 +457,7 @@ func (k *kindProvider) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc
 		}
 	}
 	newInputsMap["kubeconfig"] = kubeconfig
+	newInputsMap["name"] = clusterName
 
 	outputProperties, err := plugin.MarshalProperties(
 		resource.NewPropertyMapFromMap(newInputsMap),
@@ -557,16 +556,4 @@ func propMapToKindClusterConfig(inputs map[string]interface{}) (*v1alpha4.Cluste
 		return nil, err
 	}
 	return clusterConfig, nil
-}
-
-func kindClusterConfigToWeaklyTyped(clusterConfig *v1alpha4.Cluster) (map[string]interface{}, error) {
-	var outputs map[string]interface{}
-	clusterConfigData, err := json.Marshal(clusterConfig)
-	if err != nil {
-		return nil, err
-	}
-	if err = json.Unmarshal(clusterConfigData, &outputs); err != nil {
-		return nil, err
-	}
-	return outputs, nil
 }
