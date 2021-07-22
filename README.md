@@ -2,6 +2,13 @@
 
 The KIND resource provider for Pulumi lets you manage a local KIND cluster
 
+
+## Building
+
+```bash
+make build install
+```
+
 ## Installing
 
 `go`:
