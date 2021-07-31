@@ -111,7 +111,7 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 		Types:     map[string]schema.ComplexTypeSpec{},
 		Resources: map[string]schema.ResourceSpec{},
 		Functions: map[string]schema.FunctionSpec{},
-		Language:  map[string]json.RawMessage{},
+		Language:  map[string]schema.RawMessage{},
 	}
 
 	goImportPath := "github.com/frezbo/pulumi-provider-kind/sdk/v3/go/kind"
@@ -128,7 +128,7 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 			Description: fmt.Sprintf("KIND %s", defintion),
 			Type:        "object",
 			Properties:  map[string]schema.PropertySpec{},
-			Language:    map[string]json.RawMessage{},
+			Language:    map[string]schema.RawMessage{},
 		}
 
 		resourceSpec := schema.ResourceSpec{
@@ -164,7 +164,7 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 						Description: fmt.Sprintf("KIND %s type", defintion),
 						Type:        "object",
 						Properties:  resourceSpec.InputProperties,
-						Language:    map[string]json.RawMessage{},
+						Language:    map[string]schema.RawMessage{},
 					},
 				}
 
@@ -258,7 +258,7 @@ func PulumiSchema(swagger *jsonschema.Schema) schema.PackageSpec {
 	return pkg
 }
 
-func rawMessage(v interface{}) json.RawMessage {
+func rawMessage(v interface{}) schema.RawMessage {
 	bytes, err := json.Marshal(v)
 	contract.Assert(err == nil)
 	return bytes

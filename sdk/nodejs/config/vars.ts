@@ -4,33 +4,83 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as utilities from "../utilities";
 
-let __config = new pulumi.Config("kind");
+declare var exports: any;
+const __config = new pulumi.Config("kind");
 
 /**
  * Kind config file to use. Optional
  */
-export let configFile: string | undefined = __config.get("configFile");
+export declare const configFile: string | undefined;
+Object.defineProperty(exports, "configFile", {
+    get() {
+        return __config.get("configFile");
+    },
+    enumerable: true,
+});
+
 /**
  * File to save generated kubeconfig. Default: not set. Optional
  */
-export let kubeconfigFile: string | undefined = __config.get("kubeconfigFile");
+export declare const kubeconfigFile: string | undefined;
+Object.defineProperty(exports, "kubeconfigFile", {
+    get() {
+        return __config.get("kubeconfigFile");
+    },
+    enumerable: true,
+});
+
 /**
  * Node image to use. Optional
  */
-export let nodeImage: string | undefined = __config.get("nodeImage");
+export declare const nodeImage: string | undefined;
+Object.defineProperty(exports, "nodeImage", {
+    get() {
+        return __config.get("nodeImage");
+    },
+    enumerable: true,
+});
+
 /**
  * Provider to use. Supports docker/podman. Default: docker. Optional
  */
-export let provider: string | undefined = __config.get("provider");
+export declare const provider: string | undefined;
+Object.defineProperty(exports, "provider", {
+    get() {
+        return __config.get("provider");
+    },
+    enumerable: true,
+});
+
 /**
  * Whether to retain the nodes when creation fails. Needs manual cleanup when set to true Default: false. Optional
  */
-export let retainNodesOnFailure: boolean | undefined = __config.getObject<boolean>("retainNodesOnFailure");
+export declare const retainNodesOnFailure: boolean | undefined;
+Object.defineProperty(exports, "retainNodesOnFailure", {
+    get() {
+        return __config.getObject<boolean>("retainNodesOnFailure");
+    },
+    enumerable: true,
+});
+
 /**
  * Stop before running kubeadm commands. This would need the user to manually retrieve the Kubeconfig. Default: false. Optional
  */
-export let stopBeforeSettingK8s: boolean | undefined = __config.getObject<boolean>("stopBeforeSettingK8s");
+export declare const stopBeforeSettingK8s: boolean | undefined;
+Object.defineProperty(exports, "stopBeforeSettingK8s", {
+    get() {
+        return __config.getObject<boolean>("stopBeforeSettingK8s");
+    },
+    enumerable: true,
+});
+
 /**
  * Time in seconds to wait for nodes to become ready. Default: none. Optional
  */
-export let waitForNodeReady: number | undefined = __config.getObject<number>("waitForNodeReady");
+export declare const waitForNodeReady: number | undefined;
+Object.defineProperty(exports, "waitForNodeReady", {
+    get() {
+        return __config.getObject<number>("waitForNodeReady");
+    },
+    enumerable: true,
+});
+

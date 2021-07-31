@@ -482,7 +482,35 @@ func (k *kindProvider) Read(ctx context.Context, req *rpc.ReadRequest) (*rpc.Rea
 	label := fmt.Sprintf("%s.Read(%s)", k.name, urn)
 	pulumilog.V(9).Infof("%s executing", label)
 
-	panic("Read not implemented for 'kind:cluster:Cluster'")
+	var kindProviderOption cluster.ProviderOption
+
+	switch k.opts.Provider {
+	case kindDockerProvider:
+		kindProviderOption = cluster.ProviderWithDocker()
+	case kindPodmanProvider:
+		kindProviderOption = cluster.ProviderWithPodman()
+	}
+
+	kindProviderConfig := cluster.NewProvider(kindProviderOption)
+
+	clusters, err := kindProviderConfig.List()
+	if err != nil {
+		return &rpc.ReadResponse{}, err
+	}
+
+	// there's no way to check if the KIND cluster has been manually
+	// modified after creation, hence we if can find a cluster by it's name
+	// we return it with the input properties assuming the cluster has not been
+	// modified by hand, else we delete the cluster
+	for _, clusterName := range clusters {
+		if clusterName == req.Id {
+			return &rpc.ReadResponse{
+				Id:         clusterName,
+				Properties: req.Properties,
+			}, nil
+		}
+	}
+	return &rpc.ReadResponse{}, nil
 }
 
 // Update updates an existing resource with new values.
