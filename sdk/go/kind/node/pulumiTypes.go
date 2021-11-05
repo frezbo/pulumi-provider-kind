@@ -150,6 +150,8 @@ func (o NodeArrayOutput) Index(i pulumi.IntInput) NodeOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*NodeInput)(nil)).Elem(), NodeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*NodeArrayInput)(nil)).Elem(), NodeArray{})
 	pulumi.RegisterOutputType(NodeOutput{})
 	pulumi.RegisterOutputType(NodeArrayOutput{})
 }

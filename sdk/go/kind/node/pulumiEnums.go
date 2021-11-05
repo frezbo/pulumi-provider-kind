@@ -105,7 +105,7 @@ func (o RoleTypeOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi
 type RoleTypePtrOutput struct{ *pulumi.OutputState }
 
 func (RoleTypePtrOutput) ElementType() reflect.Type {
-	return roleTypePtrType
+	return reflect.TypeOf((**RoleType)(nil)).Elem()
 }
 
 func (o RoleTypePtrOutput) ToRoleTypePtrOutput() RoleTypePtrOutput {
@@ -114,6 +114,16 @@ func (o RoleTypePtrOutput) ToRoleTypePtrOutput() RoleTypePtrOutput {
 
 func (o RoleTypePtrOutput) ToRoleTypePtrOutputWithContext(ctx context.Context) RoleTypePtrOutput {
 	return o
+}
+
+func (o RoleTypePtrOutput) Elem() RoleTypeOutput {
+	return o.ApplyT(func(v *RoleType) RoleType {
+		if v != nil {
+			return *v
+		}
+		var ret RoleType
+		return ret
+	}).(RoleTypeOutput)
 }
 
 func (o RoleTypePtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
@@ -128,16 +138,6 @@ func (o RoleTypePtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pul
 		v := string(*e)
 		return &v
 	}).(pulumi.StringPtrOutput)
-}
-
-func (o RoleTypePtrOutput) Elem() RoleTypeOutput {
-	return o.ApplyT(func(v *RoleType) RoleType {
-		var ret RoleType
-		if v != nil {
-			ret = *v
-		}
-		return ret
-	}).(RoleTypeOutput)
 }
 
 // RoleTypeInput is an input type that accepts RoleTypeArgs and RoleTypeOutput values.
@@ -179,6 +179,8 @@ func (in *roleTypePtr) ToRoleTypePtrOutputWithContext(ctx context.Context) RoleT
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTypeInput)(nil)).Elem(), RoleType("control-plane"))
+	pulumi.RegisterInputType(reflect.TypeOf((*RoleTypePtrInput)(nil)).Elem(), RoleType("control-plane"))
 	pulumi.RegisterOutputType(RoleTypeOutput{})
 	pulumi.RegisterOutputType(RoleTypePtrOutput{})
 }

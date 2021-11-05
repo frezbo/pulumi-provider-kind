@@ -126,6 +126,8 @@ func (o PortMappingArrayOutput) Index(i pulumi.IntInput) PortMappingOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*PortMappingInput)(nil)).Elem(), PortMappingArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PortMappingArrayInput)(nil)).Elem(), PortMappingArray{})
 	pulumi.RegisterOutputType(PortMappingOutput{})
 	pulumi.RegisterOutputType(PortMappingArrayOutput{})
 }

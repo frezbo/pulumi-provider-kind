@@ -126,6 +126,8 @@ func (o PatchJSON6902ArrayOutput) Index(i pulumi.IntInput) PatchJSON6902Output {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*PatchJSON6902Input)(nil)).Elem(), PatchJSON6902Args{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PatchJSON6902ArrayInput)(nil)).Elem(), PatchJSON6902Array{})
 	pulumi.RegisterOutputType(PatchJSON6902Output{})
 	pulumi.RegisterOutputType(PatchJSON6902ArrayOutput{})
 }

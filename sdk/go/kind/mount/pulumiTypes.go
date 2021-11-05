@@ -132,6 +132,8 @@ func (o MountArrayOutput) Index(i pulumi.IntInput) MountOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*MountInput)(nil)).Elem(), MountArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*MountArrayInput)(nil)).Elem(), MountArray{})
 	pulumi.RegisterOutputType(MountOutput{})
 	pulumi.RegisterOutputType(MountArrayOutput{})
 }

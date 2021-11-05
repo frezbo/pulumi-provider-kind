@@ -116,10 +116,11 @@ func (o NetworkingOutput) ToNetworkingPtrOutput() NetworkingPtrOutput {
 }
 
 func (o NetworkingOutput) ToNetworkingPtrOutputWithContext(ctx context.Context) NetworkingPtrOutput {
-	return o.ApplyT(func(v Networking) *Networking {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v Networking) *Networking {
 		return &v
 	}).(NetworkingPtrOutput)
 }
+
 func (o NetworkingOutput) ApiServerAddress() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v Networking) *string { return v.ApiServerAddress }).(pulumi.StringPtrOutput)
 }
@@ -163,7 +164,13 @@ func (o NetworkingPtrOutput) ToNetworkingPtrOutputWithContext(ctx context.Contex
 }
 
 func (o NetworkingPtrOutput) Elem() NetworkingOutput {
-	return o.ApplyT(func(v *Networking) Networking { return *v }).(NetworkingOutput)
+	return o.ApplyT(func(v *Networking) Networking {
+		if v != nil {
+			return *v
+		}
+		var ret Networking
+		return ret
+	}).(NetworkingOutput)
 }
 
 func (o NetworkingPtrOutput) ApiServerAddress() pulumi.StringPtrOutput {
@@ -230,6 +237,8 @@ func (o NetworkingPtrOutput) ServiceSubnet() pulumi.StringPtrOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*NetworkingInput)(nil)).Elem(), NetworkingArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*NetworkingPtrInput)(nil)).Elem(), NetworkingArgs{})
 	pulumi.RegisterOutputType(NetworkingOutput{})
 	pulumi.RegisterOutputType(NetworkingPtrOutput{})
 }
